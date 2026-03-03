@@ -1,0 +1,22 @@
+.button{
+  text-align: center;
+  width: 80%;
+  background-color: black;
+  border: 1px solid white;
+  border-radius: 10px;
+  font-size: 20px;
+}
+
+.button:hover{
+  box-shadow: 2px 4px 4px white;
+  border: 1px solid white;
+}
+
+.button:active{
+  background-color: red;
+  transition: 0.5s;
+}
+
+.button-checked{
+  background-color: red;
+}

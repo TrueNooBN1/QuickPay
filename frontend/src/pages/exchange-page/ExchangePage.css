@@ -1,0 +1,12 @@
+.link{
+  max-width: 100%;
+}
+
+.container{
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  gap: 10px
+}
