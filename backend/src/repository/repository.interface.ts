@@ -1,13 +1,10 @@
-import { PostOrderDTO } from 'src/order/dto/order.dto';
+import { PostOrderDTO, TOrdersFilter, TOrderStatus } from 'src/order/dto/order.dto';
 
-export const FILM_REPOSITORY_SERVICE = 'FILM_REPOSITORY_SERVICE';
-
-export function generateTicketString(row: number, seat: number): string {
-  return `${row}:${seat}`;
-}
+export const ORDER_REPOSITORY_SERVICE = 'ORDER_REPOSITORY_SERVICE';
 
 export interface IRepositoryService {
-  getFilms();
-  getFilmSchedule(id: string);
+  getOrders(userId: string, orderFilter: TOrdersFilter);
+  getOrder(id: string);
+  patchOrderStatus(id: string, status: TOrderStatus);
   postOrder(order: PostOrderDTO);
 }

@@ -1,115 +1,140 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  generateTicketString,
   IRepositoryService,
 } from '../repository.interface';
-import { PostOrderDTO } from '../../order/dto/order.dto';
-import {
-  FilmOrSessionNotFoundException,
-  SeatAlreadyBookingException,
-} from '../../exceptions/order.exceptions';
+import { PostOrderDTO, TOrdersFilter, TOrderStatus } from '../../order/dto/order.dto';
 import { DataSource, Repository } from 'typeorm';
-import { FilmEntity } from '../../films/entitys/film.entity';
-import { Schedule } from '../../films/entitys/schedule.entity';
-import { GetFilmDTO } from 'src/films/dto/films.dto';
 import { randomUUID } from 'crypto';
+import { OrderEntity } from 'src/order/entitys/order.entity';
 
 @Injectable()
 export class PostrgreSqlRepositoryService implements IRepositoryService {
   constructor(
-    @InjectRepository(FilmEntity)
-    private filmRepository: Repository<FilmEntity>,
-    @InjectRepository(Schedule)
-    private scheduleRepository: Repository<Schedule>,
+    @InjectRepository(OrderEntity)
+    private orderRepository: Repository<OrderEntity>,
+    // @InjectRepository(Schedule)
+    // private scheduleRepository: Repository<Schedule>,
     private dataSource: DataSource,
   ) {}
 
-  private getFilmMapperFn(): (Film) => GetFilmDTO {
+  private getOrderMapperFn(): (Order) => PostOrderDTO {
     return (root) => {
       return {
         id: root.id,
-        rating: root.rating,
-        director: root.director,
-        tags: root.tags,
-        image: root.image,
-        cover: root.cover,
-        title: root.title,
-        about: root.about,
-        description: root.description,
-        schedule: root.schedule,
+        userId: root.userId,
+        name: root.name,
+        phone: root.phone,
+        wallet: root.wallet,
+        status: root.status,
+        amount: root.amount,
+        type: root.type,
+        createdAt: root.createdAt,
       };
     };
   }
 
-  async getFilms() {
-    console.log('PostrgreSqlrepositoryService::getFilms');
-    const [films, total] = await this.filmRepository.findAndCount({});
-    if (!films) return null;
+  async getOrders(userId: string, ordersFilter: TOrdersFilter) {
+    console.log('PostrgreSqlrepositoryService::getOrders');
 
-    const dbFilms = films.map(this.getFilmMapperFn());
-    return {
-      total: total,
-      items: dbFilms,
-    };
-  }
+    // Защита от отрицательных или нулевых значений
+    const page = Math.max(1, ordersFilter.pageNumber); // страница не может быть меньше 1
+    const limit = Math.max(1, ordersFilter.pageSize);  // размер страницы минимум 1
 
-  async getFilmSchedule(id: string) {
-    console.log(
-      'PostrgreSqlrepositoryService::getFilmSchedule(id: string),',
-      id,
-    );
-    const [schedules, total] = await this.scheduleRepository.findAndCount({
-      where: { filmId: id },
-      order: { daytime: 'ASC' },
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { userId },
+      skip: skip,
+      take: limit,
+      order: { createdAt: 'DESC' }
     });
-    if (!schedules) return null;
+
+    if (!orders) {
+      return {
+        total: 0,
+        items: []
+      };
+    }
+
+    const items = orders.map(order => this.getOrderMapperFn());
 
     return {
-      total: total,
-      items: schedules,
+      total,
+      items
     };
   }
 
+async getOrder(id: string): Promise<PostOrderDTO | null> {
+  console.log('PostrgreSqlrepositoryService::getOrder');
+
+  const order = await this.orderRepository.findOne({
+    where: { id },
+  });
+
+  if (!order) {
+    return null; // или можно выбросить NotFoundException
+  }
+
+  // Получаем функцию-маппер и вызываем её с найденным заказом
+  const mapper = this.getOrderMapperFn();
+  return mapper(order);
+}
+
+async patchOrderStatus(id: string, status: TOrderStatus): Promise<PostOrderDTO | null> {
+  const order = await this.orderRepository.findOne({ where: { id } });
+  
+  if (!order) {
+    return null;
+  }
+
+  order.status = status;
+
+  const updatedOrder = await this.orderRepository.save(order);
+
+  const mapper = this.getOrderMapperFn();
+  return mapper(updatedOrder);
+
+}
   async postOrder(order: PostOrderDTO) {
     console.log(
       `PostrgreSqlrepositoryService::postOrder(order: ${JSON.stringify(order)})`,
     );
-    const queryRunner = this.dataSource.createQueryRunner();
-    //checkSession availability
-    queryRunner.connect();
-    queryRunner.startTransaction();
-    for (const ticket of order.tickets) {
-      const session = await this.scheduleRepository.findOneBy({
-        id: ticket.session,
-      });
-      if (!session) {
-        console.log('noFilms');
-        queryRunner.rollbackTransaction();
-        throw new FilmOrSessionNotFoundException(ticket.film, ticket.session);
-      }
+    // const queryRunner = this.dataSource.createQueryRunner();
+    // //checkSession availability
+    // queryRunner.connect();
+    // queryRunner.startTransaction();
+    // for (const ticket of order.tickets) {
+    //   const session = await this.scheduleRepository.findOneBy({
+    //     id: ticket.session,
+    //   });
+    //   if (!session) {
+    //     console.log('noFilms');
+    //     queryRunner.rollbackTransaction();
+    //     throw new FilmOrSessionNotFoundException(ticket.film, ticket.session);
+    //   }
 
-      const takenArray = Array.isArray(session.taken) ? session.taken : [];
+    //   const takenArray = Array.isArray(session.taken) ? session.taken : [];
 
-      if (takenArray.includes(generateTicketString(ticket.row, ticket.seat))) {
-        console.log('noSeat');
-        queryRunner.rollbackTransaction();
-        throw new SeatAlreadyBookingException(ticket.seat, ticket.row);
-      } else {
-        takenArray.push(generateTicketString(ticket.row, ticket.seat));
-        session.taken = takenArray;
-        await this.scheduleRepository.save(session);
-      }
-    }
-    queryRunner.commitTransaction();
+    //   if (takenArray.includes(generateTicketString(ticket.row, ticket.seat))) {
+    //     console.log('noSeat');
+    //     queryRunner.rollbackTransaction();
+    //     throw new SeatAlreadyBookingException(ticket.seat, ticket.row);
+    //   } else {
+    //     takenArray.push(generateTicketString(ticket.row, ticket.seat));
+    //     session.taken = takenArray;
+    //     await this.scheduleRepository.save(session);
+    //   }
+    // }
+    // queryRunner.commitTransaction();
 
-    const responseObject = {
-      total: order.tickets.length,
-      items: order.tickets.map((ticket) => ({
-        ...ticket,
-        id: randomUUID(),
-      })),
-    };
-    return responseObject;
+    // const responseObject = {
+    //   total: order.tickets.length,
+    //   items: order.tickets.map((ticket) => ({
+    //     ...ticket,
+    //     id: randomUUID(),
+    //   })),
+    // };
+    // return responseObject;
   }
 }

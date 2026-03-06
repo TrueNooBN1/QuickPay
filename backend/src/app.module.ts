@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'node:path';
 import { configProvider } from './app.config.provider';
-import { FilmsController } from './films/films.controller';
 import { OrderController } from './order/order.controller';
-import { FilmsService } from './films/films.service';
 import { OrderService } from './order/order.service';
 import { DatabaseModule } from './database-module/database-module.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -20,9 +20,17 @@ import { DatabaseModule } from './database-module/database-module.module';
       serveRoot: '/',
     }),
     DatabaseModule.register(configProvider.useValue.database.driver),
+    PassportModule,
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => ({
+        secret: config.get('JWT_SECRET'),
+        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') },
+      }),
+      inject: [ConfigService],
+    }),
   ],
-  controllers: [FilmsController, OrderController],
-  providers: [configProvider, FilmsService, OrderService],
+  controllers: [OrderController],
+  providers: [configProvider, OrderService, ],
   exports: [configProvider],
 })
 export class AppModule {}

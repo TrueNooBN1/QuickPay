@@ -10,9 +10,8 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.setGlobalPrefix('api/afisha');
+  app.setGlobalPrefix('api/exchanger');
   app.enableCors();
-  console.log(configProvider.useValue.database);
   const loggerFactory = new LoggerFactory(configProvider.useValue.loggerType);
   const logger = loggerFactory.createLogger();
   app.useLogger(logger);

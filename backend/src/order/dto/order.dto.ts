@@ -9,14 +9,25 @@ import {
 } from 'class-validator';
 
 
-enum TOrderType {
+export enum TOrderType {
   SELL = 'Sell',
   BUY = 'Buy',
 }
-enum TOrderStatus {
+
+export enum TOrderStatus {
   CREATED = 'created',
   READY = 'ready',
   DENIED = 'denied',
+}
+
+export type TOrdersFilter = {
+  pageSize: number;
+  pageNumber: number;
+}
+
+export type PatchOrderDTO = {
+  id: string;
+  status: TOrderStatus;
 }
 
 export class PostOrderDTO {

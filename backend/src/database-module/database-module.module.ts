@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongoRepositoryService } from '../repository/MongoRepository/mongorepository.service';
-import { FILM_REPOSITORY_SERVICE } from '../repository/repository.interface';
+import { ORDER_REPOSITORY_SERVICE } from '../repository/repository.interface';
 import { MongooseModule } from '@nestjs/mongoose';
 import { configProvider } from '../app.config.provider';
-import { filmSchema, Film } from '../films/schemas/films.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostrgreSqlRepositoryService } from 'src/repository/PostrgreSQLRepository/postrgre-sqlrepository.service';
-import { Schedule } from 'src/films/entitys/schedule.entity';
-import { FilmEntity } from 'src/films/entitys/film.entity';
+import { OrderEntity } from 'src/order/entitys/order.entity';
 
 export enum DBMS {
   MongoDB = 'mongodb',
@@ -22,11 +19,13 @@ export class DatabaseModule {
     const exports = [];
 
     providers.push(configProvider);
+    console.log(configProvider.useValue.database);
 
     switch (dbms) {
+      default:
       case DBMS.PostgreSQL:
         providers.push({
-          provide: FILM_REPOSITORY_SERVICE,
+          provide: ORDER_REPOSITORY_SERVICE,
           useClass: PostrgreSqlRepositoryService,
         });
         imports.push(
@@ -36,26 +35,15 @@ export class DatabaseModule {
             port: configProvider.useValue.database.sqldatabase.port,
             username: configProvider.useValue.database.sqldatabase.username,
             password: configProvider.useValue.database.sqldatabase.password,
-            database: 'film-react-nest',
-            entities: [FilmEntity, Schedule],
-            synchronize: false,
+            database: 'quickpay-db',
+            entities: [OrderEntity],
+            synchronize: true,
           }),
-          TypeOrmModule.forFeature([FilmEntity, Schedule]),
-        );
-        break;
-      case DBMS.MongoDB:
-      default:
-        providers.push({
-          provide: FILM_REPOSITORY_SERVICE,
-          useClass: MongoRepositoryService,
-        });
-        imports.push(
-          MongooseModule.forRoot(configProvider.useValue.database.url),
-          MongooseModule.forFeature([{ name: Film.name, schema: filmSchema }]),
+          TypeOrmModule.forFeature([OrderEntity]),
         );
         break;
     }
-    exports.push(FILM_REPOSITORY_SERVICE);
+    exports.push(ORDER_REPOSITORY_SERVICE);
     return {
       module: DatabaseModule,
       imports,
