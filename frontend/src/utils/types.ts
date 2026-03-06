@@ -1,4 +1,4 @@
-export type TOrderStatus = "created" | "inProgress" | "ready" | "denied"; // или используйте enum
+export type TOrderStatus = "created" | "ready" | "denied"; // или используйте enum
 
 export type TOrder = {
   _id: string;
@@ -14,7 +14,6 @@ export type TOrder = {
 // Маппинг статусов для отображения
 export const statusConfig: Record<TOrderStatus, { label: string; className: string }> = {
   created: { label: 'Создан', className: 'status-created' },
-  inProgress: { label: 'В обработке', className: 'status-processing' },
   ready: { label: 'Выполнен', className: 'status-completed' },
   denied: { label: 'Отменен', className: 'status-cancelled' },
 };
