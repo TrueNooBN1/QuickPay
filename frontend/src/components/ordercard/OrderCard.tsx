@@ -1,0 +1,115 @@
+// components/ExchangeCard/ExchangeCard.tsx
+import React from 'react';
+import './OrderCard.css';
+import { statusConfig, type TOrder } from '../../utils/types';
+import Button from '../button/button';
+
+export type OrderStatus = 0 | 1 | 2 | 3 | 4; // или используйте enum
+
+export interface OrderCardProps {
+  order: TOrder;
+  /** Обработчик клика по карточке */
+  onAccept?: (id: string) => void | undefined;
+  onDecline?: (id: string) => void | undefined;
+  /** Дополнительный класс */
+  className?: string;
+}
+
+
+const OrderCard: React.FC<OrderCardProps> = ({
+  order,
+  onAccept = undefined,
+  onDecline = undefined,
+  className = '',
+}) => {
+  // Форматирование адреса кошелька (показываем первые и последние символы)
+
+  console.log(onDecline);
+  const formatWallet = (wallet: string) => {
+    if (wallet.length <= 12) return wallet;
+    return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
+  };
+
+  // Форматирование суммы
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat('ru-RU', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  // Определяем класс для типа операции
+  const typeClass = order.type.toLowerCase() === 'buy' ? 'type-buy' : 'type-sell';
+  const typeLabel = order.type.toLowerCase() === 'buy' ? 'Покупка' : 'Продажа';
+
+  // Получаем конфигурацию статуса
+  const statusInfo = statusConfig[order.status] || statusConfig["created"];
+
+  // Форматирование даты
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  return (
+    <div
+      className={`order-card ${className}`}
+    >
+      <div className="order-card__header">
+        <span className={`order-card__type ${typeClass}`}>
+          {typeLabel}
+        </span>
+        <span className={`order-card__status ${statusInfo.className}`}>
+          {statusInfo.label}
+        </span>
+      </div>
+
+      <div className="order-card__body">
+        <div className="order-card__row">
+          <span className="order-card__label">Кошелек:</span>
+          <span className="order-card__wallet" title={order.wallet}>
+            {formatWallet(order.wallet)}
+          </span>
+        </div>
+
+        <div className="order-card__row">
+          <span className="order-card__label">Сумма:</span>
+          <span className="order-card__amount">
+            {formatAmount(order.amount)}
+          </span>
+        </div>
+
+        {order.createdAt && (
+          <div className="order-card__row">
+            <span className="order-card__label">Дата:</span>
+            <span className="order-card__date">
+              {formatDate(order.createdAt)}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      {onAccept && (
+        <div className="order-card__footer" onClick={()=>onAccept(order._id)}>
+          <span className="order-card__details">Подтвердить выполнение</span>
+        </div>
+      )}
+      
+      {onDecline && (
+        <div className="order-card__footer" onClick={()=>onDecline(order._id)}>
+          <span className="order-card__details">Отменить</span>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default OrderCard;

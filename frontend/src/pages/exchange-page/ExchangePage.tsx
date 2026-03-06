@@ -12,6 +12,9 @@ import Text from '../../components/text/text';
 import Input from '../../components/input/input';
 import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlice';
 import Preloader from '../../components/preloader/preloader';
+import { Modal } from '../../components/modal/Modal';
+import { ordersStatusSelector } from '../../services/slices/OrderSlice/OrderSlice';
+import OrderForm from '../../forms/OrderForm/OrderForm';
 
 
 export const ExchangePage: FC = () => {
@@ -27,10 +30,11 @@ export const ExchangePage: FC = () => {
   const rates = useSelector(rateSelector);
   
   const [selectedType, setSelectedType] = useState(0);
+  const [btnClicked, setBtnClicked] = useState(false);
 
   const [inputValue, setInputValue] = useState('');
   const [countedValue, setCountedValue] = useState(NaN);
-  
+  const orderRequest = useSelector(ordersStatusSelector);  
 
   const handleValueChange = (newValue: string) => {
     setInputValue(newValue);
@@ -41,14 +45,18 @@ export const ExchangePage: FC = () => {
     return <Preloader/>
   }
 
+  const updateType = (type: number) =>{
+    setSelectedType(type)
+    setInputValue("");
+    setBtnClicked(false);
+  }
+
   return (
-    <Page>
-      
+    <Page>      
       <div className='container'>
         <Button 
           onClick={()=>{
-            setSelectedType(0)
-            setInputValue("");
+            updateType(0);
           }}
           className={(selectedType === 0) ? "button-checked" : ""}
         >
@@ -57,8 +65,7 @@ export const ExchangePage: FC = () => {
 
         <Button 
           onClick={()=>{
-            setSelectedType(1)
-            setInputValue("");
+            updateType(1);
           }}
           className={(selectedType === 1) ? "button-checked" : ""}
           >
@@ -81,19 +88,29 @@ export const ExchangePage: FC = () => {
 
         {selectedType === 0 ?
           <Text>
-            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue/rates.rateOut).toFixed(2)} ₮`}
+            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue/rates.rateIn).toFixed(2)} ₮`}
             {/* {`Вы получите ${(countedValue/rates.rateOut).toFixed(2)} ₮`} */}
           </Text>
          :
           <Text>
-            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue * rates.rateIn).toFixed(2)} ₽`}
+            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue * rates.rateOut).toFixed(2)} ₽`}
             {/* {`Вы получите ${(countedValue * rates.rateIn).toFixed(2)} ₽`} */}
           </Text>
         }
       </div>
-      <Button onClick={()=>navigate("/")}>
+
+      {/* <Button onClick={()=>navigate("/exchange/create")}>
         Оформить заявку
-      </Button>
+      </Button> */}
+      {!btnClicked &&
+        <Button onClick={()=>{if(inputValue.length > 0) setBtnClicked(true)}}>
+          Оформить заявку
+        </Button>
+      }
+      
+      {btnClicked && (
+        <OrderForm />
+      )}
 
     </Page>
   );

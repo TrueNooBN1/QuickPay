@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import "./input.css"
 
 
@@ -9,10 +9,8 @@ interface InputProps {
 }
 
 const Input = ({ onValueChange, unit = "", value = ""}: InputProps) => {
-  // const [value, setValue] = useState('');
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    // setValue(e.target.value);
     onValueChange(newValue);
   };
 
@@ -22,7 +20,7 @@ const Input = ({ onValueChange, unit = "", value = ""}: InputProps) => {
         type="number"
         value={value}
         onChange={handleChange}
-        placeholder="Введите значение..."
+        placeholder="Введите сумму..."
         className='input'
       />
       <span className="input-unit__label">{unit}</span>

@@ -1,7 +1,8 @@
+import { apiUrl } from '../const/const';
 import { setCookie, getCookie } from './cookie';
 import type { TOrder, TOrdersData, TRate, TUser } from './types';
 
-const URL = import.meta.env.VITE_API_URL;
+const URL = apiUrl;
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -61,9 +62,7 @@ type TRateResponse = TServerResponse<{
   rates: TRate;
 }>;
 
-type TOrdersResponse = TServerResponse<{
-  orders: TOrder[];
-}>;
+type TOrdersResponse = TServerResponse<TOrdersData>;
 
 
 type TNewOrderResponse = TServerResponse<{

@@ -1,23 +1,17 @@
-// import { Preloader } from '@ui';
-// import { FeedUI } from '@ui-pages';
-// import { TOrder } from './../../utils/types';
-import { useEffect, useState } from 'react';
+import { useEffect} from 'react';
 import type {FC} from "react"
-// import {
-//   feedOrdersSelector,
-//   getFeed
-// } from './../../services/slices/FeedSlice/FeedSlice';
 import { useSelector, useDispatch } from '../../services/store/store';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './MainPage.css';
 import { Page} from '../Page/Page';
 import Button from '../../components/button/button';
 import RatePresenter from '../../components/rate-presenter/rate-presenter';
 import { supportLink } from '../../const/const';
 import { getRates, rateSelector, rateStatusSelector } from '../../services/slices/RateSlice/RateSlice';
-import { ReqStatus } from '../../utils/types';
-import { Oval } from 'react-loader-spinner';
+// import { ReqStatus } from '../../utils/types';
 import Preloader from '../../components/preloader/preloader';
+import OrderCard from '../../components/ordercard/OrderCard';
+import type { TOrder } from '../../utils/types';
 
 export const MainPage: FC = () => {
   const dispatch = useDispatch();
@@ -37,11 +31,10 @@ export const MainPage: FC = () => {
   if (!rates) {
     return <Preloader/>
   }
-    
 
   return (
     <Page>
-      <div className={`container`}>
+       <div className={`container`}>
         <RatePresenter 
           header='Продажа'
           rate={rates.rateIn}
@@ -58,32 +51,34 @@ export const MainPage: FC = () => {
       </div>
 
       <Button onClick={()=>{
-        console.log("to exhcnage");
         navigate("/exchange")
       }}>
           Обмен
       </Button>
 
       <Button onClick={()=>{
-        console.log("to /profile");
         navigate("/profile")
       }}>
         Профиль
       </Button>
 
       <Button onClick={()=>{
-        console.log("to about");
         navigate("/about")
       }}>
         О нас
       </Button>
 
-      <Button onClick={()=>{
-        console.log("to support");
-        window.location.href = supportLink;
-      }}>
+      <Button>
+        <Link target='_blank' to={supportLink} className='link'>
           Поддержка
-      </Button>     
+        </Link>
+      </Button>
+
+      <Button onClick={()=>{
+        navigate("/admin")
+      }}>
+        Админка
+      </Button>
       
     </Page>
   );

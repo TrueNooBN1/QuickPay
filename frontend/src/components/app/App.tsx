@@ -11,6 +11,10 @@ import { AboutPage } from '../../pages/about-page';
 import AppHeader from '../appheader/appheader';
 import { ExchangePage } from '../../pages/exchange-page/ExchangePage';
 import { getUserData } from '../../services/slices/UserSlice/UserSlice';
+import { Modal } from '../modal/Modal';
+import OrderForm from '../../forms/OrderForm/OrderForm';
+import { ProfilePage } from '../../pages/profile-page/ProfilePage';
+import { AdminPage } from '../../pages/admin-page/AdminPage';
 
 function App() {
   const navigate = useNavigate();
@@ -34,6 +38,8 @@ function App() {
         <Route path='/' element={<MainPage/> } />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/exchange' element={<ExchangePage />} />
+        <Route path='/profile' element={<ProfilePage />} />
+        <Route path='/admin' element={<AdminPage />} />
           {/* <Route path='/feed'>
             <Route index element={<Feed />} />
             <Route path=':number' element={<OrderInfo />} />
@@ -70,10 +76,10 @@ function App() {
         </Routes>
 
         {/* modalRoutes */}
-        {/* {backgroundLocation && (
+        {backgroundLocation && (
           <Routes>
-            <Route
-              path='/profile/orders/:number'
+            {/* <Route
+              path='/orders/:number'
               element={
                 <ProtectedRoute onlyUnAuth={false}>
                   <Modal title='Заказ' onClose={closeModal}>
@@ -81,25 +87,17 @@ function App() {
                   </Modal>
                 </ProtectedRoute>
               }
-            />
+            /> */}
             <Route
-              path='/ingredients/:id'
-              element={
-                <Modal title='Ингредиент' onClose={closeModal}>
-                  <IngredientDetails />
-                </Modal>
-              }
-            />
-            <Route
-              path='/feed/:number'
+              path='/exchange/create'
               element={
                 <Modal title='Заказ' onClose={closeModal}>
-                  <OrderInfo />
+                  <OrderForm />
                 </Modal>
               }
             />
           </Routes>
-        )} */}
+        )}
       {/* <AppFooter /> */}
     </div>
   )

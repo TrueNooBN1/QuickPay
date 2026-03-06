@@ -6,8 +6,11 @@
   min-width: 375px;
   width: 100%;
   max-width: 768px;
-  height: 100vh;
+  min-height: 100vh;
   gap: 2em;
   background-color: black;
   color: #f2f2f3;
+  margin: 0;
+  padding: 0;
+  padding-top: 10px;
 }

@@ -1,11 +1,25 @@
+export type TOrderStatus = "created" | "inProgress" | "ready" | "denied"; // или используйте enum
+
 export type TOrder = {
   _id: string;
   userId: string;
   name: string;
-  amount: string;
-  type: OrderType;
+  wallet: string,
+  status: TOrderStatus,
+  amount: number;
+  type: TOrderType;
   createdAt: string;
 };
+
+// Маппинг статусов для отображения
+export const statusConfig: Record<TOrderStatus, { label: string; className: string }> = {
+  created: { label: 'Создан', className: 'status-created' },
+  inProgress: { label: 'В обработке', className: 'status-processing' },
+  ready: { label: 'Выполнен', className: 'status-completed' },
+  denied: { label: 'Отменен', className: 'status-cancelled' },
+};
+
+
 
 export type TOrdersData = {
   orders: TOrder[];
@@ -38,4 +52,4 @@ export const ReqStatus = {
 
 export type ReqStatus = typeof ReqStatus[keyof typeof ReqStatus];
 
-export type OrderType = 'Sell' | 'Buy';
+export type TOrderType = 'Sell' | 'Buy';
