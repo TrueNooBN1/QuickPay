@@ -12,44 +12,46 @@ import Text from '../../components/text/text';
 import Input from '../../components/input/input';
 import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlice';
 import Preloader from '../../components/preloader/preloader';
-import { Modal } from '../../components/modal/Modal';
 import { ordersStatusSelector } from '../../services/slices/OrderSlice/OrderSlice';
-import OrderForm from '../../forms/OrderForm/OrderForm';
+import { userDataSelector } from '../../services/slices/UserSlice/UserSlice';
+import RequestUserDataForm from '../../forms/OrderForm/OrderUserDataForm';
 
 
 export const ExchangePage: FC = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate()
-  
-  useEffect(() => {
-    dispatch(getRates());
-  }, [dispatch]);
-  
-  
+
   const rates = useSelector(rateSelector);
-  
+  const userData = useSelector(userDataSelector);
+  const orderRequest = useSelector(ordersStatusSelector);  
+
+  const [isInitialized, setIsInitialized] = useState(false);
   const [selectedType, setSelectedType] = useState(0);
   const [btnClicked, setBtnClicked] = useState(false);
-
   const [inputValue, setInputValue] = useState('');
   const [countedValue, setCountedValue] = useState(NaN);
-  const orderRequest = useSelector(ordersStatusSelector);  
 
   const handleValueChange = (newValue: string) => {
     setInputValue(newValue);
     setCountedValue(Number(newValue));
   };
 
-  if (!rates) {
-    return <Preloader/>
-  }
-
   const updateType = (type: number) =>{
     setSelectedType(type)
     setInputValue("");
     setBtnClicked(false);
   }
+
+  useEffect(() => {
+    dispatch(getRates());
+  }, [dispatch]);
+
+
+  if (!rates) {
+    return <Preloader/>
+  }
+
 
   return (
     <Page>      
@@ -109,7 +111,8 @@ export const ExchangePage: FC = () => {
       }
       
       {btnClicked && (
-        <OrderForm />
+      <RequestUserDataForm/>
+        
       )}
 
     </Page>

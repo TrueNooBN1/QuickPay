@@ -13,7 +13,7 @@ const Text: FC<TextProps> = ({
   className = '' 
 }) => {
   return (
-    <p className={`text + ${className}`}>
+    <p className={`text ${className}`}>
       {children}
     </p>
   );

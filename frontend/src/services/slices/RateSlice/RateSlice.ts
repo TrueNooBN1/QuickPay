@@ -1,7 +1,7 @@
 import {
   getRateApi
 } from './../../../utils/api';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { ReqStatus } from './../../../utils/types';
 import type { TRate } from './../../../utils/types';
 
@@ -13,9 +13,10 @@ interface IRateSlice {
   error: string | null;
 }
 
+
 export const initialState: IRateSlice = {
-  // rate: undefined,
-  rate: {rateIn: 82, rateOut: 80},
+  rate: undefined,
+  // rate: {rateIn: 82, rateOut: 80},
   status: ReqStatus.Idle,
   error: null
 };
@@ -33,7 +34,7 @@ export const RateSlice = createSlice({
       .addCase(getRates.fulfilled, (state, action) => {
         state.status = ReqStatus.Success;
         state.error = null;
-        state.rate = action.payload;
+        state.rate = action.payload.rates;
       })
       .addCase(getRates.rejected, (state, action) => {
         state.status = ReqStatus.Failed;

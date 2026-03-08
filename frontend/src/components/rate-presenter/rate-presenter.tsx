@@ -19,7 +19,7 @@ const RatePresenter: FC<RatePresenterProps> = ({
 }) => {
   return (
     <div className='rate-container'>
-      <h3>{header}</h3>
+      <h3 className='text'>{header}</h3>
   
       {typeof rateStringConverterFunc === 'function' ? (
         <Text className={`formatted-text + ${className}`}>

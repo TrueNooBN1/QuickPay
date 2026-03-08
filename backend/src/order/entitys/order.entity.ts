@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('order')
 export class OrderEntity {
-  @PrimaryGeneratedColumn({ name: 'id' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -22,7 +22,13 @@ export class OrderEntity {
   status: string;
 
   @Column()
-  amount: string;
+  totalSum: number;
+
+  @Column()
+  exchangeRate: number;
+
+  @Column()
+  exchangeValue: number;
 
   @Column()
   type: string;

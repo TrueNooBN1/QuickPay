@@ -2,7 +2,7 @@
 import React from 'react';
 import './OrderCard.css';
 import { statusConfig, type TOrder } from '../../utils/types';
-import Button from '../button/button';
+// import Button from '../button/button';
 
 export type OrderStatus = 0 | 1 | 2 | 3 | 4; // или используйте enum
 
@@ -24,7 +24,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
 }) => {
   // Форматирование адреса кошелька (показываем первые и последние символы)
 
-  console.log(onDecline);
   const formatWallet = (wallet: string) => {
     if (wallet.length <= 12) return wallet;
     return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
@@ -82,7 +81,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
         <div className="order-card__row">
           <span className="order-card__label">Сумма:</span>
           <span className="order-card__amount">
-            {formatAmount(order.amount)}
+            {formatAmount(order.exchangeValue)}
           </span>
         </div>
 

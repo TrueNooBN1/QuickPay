@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt-ts';
 import { UserService } from '../tg_user/tg_user.service';
 import { TelegramAuthDTO } from './dto/tg_auth.dto';
+import { GetUserDTO } from 'src/tg_user/dto/get-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,17 +23,16 @@ export class AuthService {
   //   return null;
   // }
 
-  async validateUser(telegramId: string): Promise<any> {
-    const user = await this.userService.findById(telegramId);
-    return user;
-  }
 
   async login(authDto: TelegramAuthDTO) {
-    const user = await this.validateUser(authDto.telegramId);
+    const user = await this.userService.validateUser(authDto.telegramId);
+    console.log("validate userId " + JSON.stringify(user));
     if (!user){
+    console.log("async login(authDto: TelegramAuthDTO) + await this.register(authDto)")
       return await this.register(authDto)
       //throw new UnauthorizedException('Invalid credentials');
-    } 
+    }
+    console.log("async login(authDto: TelegramAuthDTO) + this.generateTokens(user)")
     return this.generateTokens(user);
   }
 
@@ -57,15 +57,15 @@ export class AuthService {
   }
 
   async getUser(id: string) {
-    return this.userService.findById(id);
+    return this.userService.findByUserId(id);
   }
 
   async updateUser(id: string, updateData: any) {
     return this.userService.updateTelegramUser(id, updateData);
   }
 
-  private generateTokens(user: any) {
-    const payload = { sub: user.id, email: user.email };
+  private generateTokens(user: GetUserDTO) {
+    const payload = { sub: user.id, roles: user.roles };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '15m',
@@ -75,7 +75,9 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '7d',
     });
     // Сохраняем refreshToken хеш в БД
+    console.log(JSON.stringify(user) + "user");
+
     this.userService.setRefreshToken(user.id, refreshToken);
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user};
   }
 }

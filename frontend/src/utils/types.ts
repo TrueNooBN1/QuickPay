@@ -1,14 +1,19 @@
-export type TOrderStatus = "created" | "ready" | "denied"; // или используйте enum
 
-export type TOrder = {
+export type TOrder = TNewOrder & {
   _id: string;
+  status: TOrderStatus,
+  createdAt: string;
+};
+
+export type TNewOrder = {
   userId: string;
   name: string;
+  phone: string;
   wallet: string,
-  status: TOrderStatus,
-  amount: number;
+  exchangeRate: number;
+  exchangeValue: number;
+  totalSum: number;
   type: TOrderType;
-  createdAt: string;
 };
 
 // Маппинг статусов для отображения
@@ -18,24 +23,25 @@ export const statusConfig: Record<TOrderStatus, { label: string; className: stri
   denied: { label: 'Отменен', className: 'status-cancelled' },
 };
 
-
-
 export type TOrdersData = {
   orders: TOrder[];
   total: number;
 };
 
-export type TUserInfo = {
-  wallet: string;
-  name: string;
-  phoneNumber: string;
-}
-
 export type TUser = {
-  _id: string;
-  telegramId: string;
-  userData: TUserInfo;
+  id: string;
+  // telegramId: string;
+  wallet?: string;
+  name?: string;
+  phone?: string;
+  roles: string[];
 };
+
+export type TUpdateUserData = {
+  wallet?: string;
+  name?: string;
+  phone?: string;
+}
 
 export type TRate = {
   rateIn: number;
@@ -51,4 +57,20 @@ export const ReqStatus = {
 
 export type ReqStatus = typeof ReqStatus[keyof typeof ReqStatus];
 
-export type TOrderType = 'Sell' | 'Buy';
+// export type TOrderType = 'Sell' | 'Buy';
+
+export const TOrderType = {
+  Sell: 'SELL',
+  Buy: 'BUY',
+} as const;
+
+export type TOrderType = typeof TOrderType[keyof typeof TOrderType];
+
+
+// export type TOrderStatus = "created" | "ready" | "denied"; // или используйте enum
+export const TOrderStatus = {
+  created: 'created',
+  ready: 'ready',
+  denied: 'denied',
+} as const;
+export type TOrderStatus = typeof TOrderStatus[keyof typeof TOrderStatus];

@@ -5,90 +5,167 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  IRepositoryService,
-  ORDER_REPOSITORY_SERVICE,
-} from '../repository/repository.interface';
-import { PatchOrderDTO, PostOrderDTO, TOrdersFilter } from './dto/order.dto';
+
+import { PatchOrderDTO, PostOrderDTO, TOrdersFilter, TOrderStatus } from './dto/order.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrderEntity } from './entitys/order.entity';
+import { DataSource, Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @Inject(ORDER_REPOSITORY_SERVICE)
-    private readonly repository: IRepositoryService,
+    @InjectRepository(OrderEntity)
+    private orderRepository: Repository<OrderEntity>,
+    private dataSource: DataSource,
   ) {}
+
+
+  private prevRateIn: number | null = null;
+  private prevRateOut: number | null = null;
+  private prevRateUpdateTime: Date | null = null;
+
+
+
+  private getOrderMapperFn(): (Order) => PostOrderDTO {
+    return (root) => {
+      return {
+        id: root.id,
+        userId: root.userId,
+        name: root.name,
+        phone: root.phone,
+        wallet: root.wallet,
+        status: root.status,
+        totalSum: root.totalSum,
+        exchangeRate: root.exchangeRate,  
+        exchangeValue: root.exchangeValue,
+        type: root.type,
+        createdAt: root.createdAt,
+      };
+    };
+  }
 
   async postOrder(order: PostOrderDTO) {
     console.log(`OrderService::postOrder(order: ${JSON.stringify(order)})`);
-    try {
+    const queryRunner = this.dataSource.createQueryRunner();
+    //checkSession availability
+    queryRunner.connect();
+    queryRunner.startTransaction();
 
-      const orderResponse = await this.repository.postOrder(order);
-      return orderResponse;
+    if(order.exchangeValue===undefined ||
+       order.exchangeRate===undefined || 
+       order.totalSum===undefined || 
+       order.name.length===0 || 
+       order.phone.length===0 || 
+       order.userId.length===0 || 
+       order.type.length===0 || 
+       order.wallet.length===0)
+      throw new BadRequestException("Некорректные данные для офромления заявки");
 
-    } catch (error) {
-      console.log(
-        'OrderService::postOrder(order: PostOrderDTO) drop with error: ',
-        error,
-      );
-      throw new BadRequestException({ message: error.message });
-    }
+    const newOrder = await this.orderRepository.save({
+      totalSum: order.totalSum,
+      exchangeValue: order.exchangeValue,
+      exchangeRate: order.exchangeRate,
+      name: order.name,
+      phone: order.phone,
+      userId: order.userId,
+      type: order.type,
+      wallet: order.wallet,
+      status: TOrderStatus.CREATED,
+      createdAt: new Date(),
+    });
+
+    queryRunner.commitTransaction();
+    console.log(`OrderService::postOrder after commit (order: ${JSON.stringify(newOrder)})`);
+
+    const mapper = this.getOrderMapperFn();
+    return mapper(newOrder);
+
   }
 
-  async getOrders(userId: string, orderFilter: TOrdersFilter) {
+  async getOrders(userId: string, ordersFilter: TOrdersFilter) {
     console.log(`OrderService::getOrders(
         userId: ${userId}},
-        orderFilter: ${JSON.stringify(orderFilter)})`);
-    try {
-      if (orderFilter.pageSize === 0 || orderFilter.pageNumber < 0) {
-        throw new BadRequestException("Не заданы параметры фильтра");
-      }
-      const orderResponse = await this.repository.getOrders(userId, orderFilter);
+        orderFilter: ${JSON.stringify(ordersFilter)})`);
+    // Защита от отрицательных или нулевых значений
+    const page = Math.max(1, ordersFilter.pageNumber); // страница не может быть меньше 1
+    const limit = Math.max(1, ordersFilter.pageSize);  // размер страницы минимум 1
 
-      return orderResponse;
-    } catch (error) {
-      console.log(
-        'OrderService::getOrders(userId: string, orderFilter: TOrdersFilter) drop with error: ',
-        error,
-      );      
-      throw new BadRequestException({ message: error.message });
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { userId },
+      skip: skip,
+      take: limit,
+      order: { createdAt: 'DESC' }
+    });
+
+    if (!orders) {
+      return {
+        total: 0,
+        items: []
+      };
     }
+
+    const items = orders.map(order => this.getOrderMapperFn());
+
+    return {
+      total,
+      items
+    };
   }
 
   async getOrder(id: string) {
     console.log(`OrderService::getOrder(
         id: ${id})`);
-    try {
-      if (id.length === 0) {
-        throw new BadRequestException("Не заданы параметры фильтра");
-      }
-      const orderResponse = await this.repository.getOrder(id);
 
-      return orderResponse;
-    } catch (error) {
-      console.log(
-        'OrderService::getOrder(id: string) drop with error: ',
-        error,
-      );      
-      throw new BadRequestException({ message: error.message });
+    const order = await this.orderRepository.findOne({
+      where: { id },
+    });
+
+    if (!order) {
+      return null; // или можно выбросить NotFoundException
     }
+
+    // Получаем функцию-маппер и вызываем её с найденным заказом
+    const mapper = this.getOrderMapperFn();
+    return mapper(order);
+
   }
 
-  async patchOrder(patchOrder: PatchOrderDTO) {
-    console.log(`patchOrder(patchOrder: ${patchOrder}})`);
-    try {
-      if (patchOrder.id.length === 0 || patchOrder.status.length === 0) {
-        throw new BadRequestException("Не заданы параметры фильтра");
+  async patchOrderStatus(id: string, status: TOrderStatus): Promise<PostOrderDTO | null> {
+    console.log(`OrderService::patchOrderStatus(id: ${id}, status: ${status}})`);
+
+    const order = await this.orderRepository.findOne({ where: { id } });
+    
+    if (!order) {
+      return null;
+    }
+
+    order.status = status;
+
+    const updatedOrder = await this.orderRepository.save(order);
+
+    const mapper = this.getOrderMapperFn();
+    return mapper(updatedOrder);
+
+  }
+  setRate(rateIn:number, rateOut:number){
+    this.prevRateUpdateTime = new Date();
+    this.prevRateIn = rateIn;
+    this.prevRateOut = 1/rateOut;
+    console.log(`this.prevRateIn ${this.prevRateIn}`)
+    console.log(`this.prevRateOut ${this.prevRateOut}`)
+  }
+
+  async getRates(){
+
+    return {
+      rates:{
+        rateIn: Math.floor(this.prevRateIn * 1.02*100)/100,
+        rateOut: Math.ceil(this.prevRateOut * 0.98*100)/100
       }
-
-      const orderResponse = await this.repository.patchOrderStatus(patchOrder.id, patchOrder.status);
-
-      return orderResponse;
-    } catch (error) {
-      console.log(
-        'OrderService::patchOrder(patchOrder: PatchOrderDTO) drop with error: ',
-        error,
-      );      
-      throw new BadRequestException({ message: error.message });
     }
   }
+  
 }

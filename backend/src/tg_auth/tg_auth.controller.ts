@@ -13,8 +13,9 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @Post('login')
+  @Post('tg_login')
   async login(@Body() loginDto: TelegramAuthDTO) {
+    console.log("login dto:    "+ JSON.stringify(loginDto));
     return this.authService.login(loginDto);
   }
 
@@ -23,13 +24,13 @@ export class AuthController {
     return this.authService.refreshToken(refreshDto.refreshToken);
   }
 
-  @Get('me')
+  @Get('user')
   @UseGuards(JwtAuthGuard)
   async getMe(@User() user: any) {
     return this.authService.getUser(user.userId);
   }
 
-  @Patch('me')
+  @Patch('user')
   @UseGuards(JwtAuthGuard)
   async updateMe(@User() user: any, @Body() updateData: any) {
     return this.authService.updateUser(user.userId, updateData);

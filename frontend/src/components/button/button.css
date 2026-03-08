@@ -1,11 +1,12 @@
 .button{
   text-align: center;
   width: 80%;
-  background-color: black;
+  background-color: var(--main-background-color);
   border: 1px solid white;
   border-radius: 10px;
   font-size: 20px;
-  color: white;
+  background-color: var(--main-background-color);
+  color: var(--main-font-color);
 }
 
 .button:hover{

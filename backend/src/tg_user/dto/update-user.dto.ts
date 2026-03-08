@@ -1,15 +1,10 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsOptional, isString, IsString, IsUUID } from 'class-validator';
 
-
-export enum UserRole {
-  ADMIN = 'Admin',
-  USER = 'User'
-}
 
 
 export class UpdateUserDTO {
   @IsOptional()
-  @IsEmail()
+  @IsString()
   wallet?: string;
 
   @IsOptional()

@@ -1,9 +1,10 @@
-import { Controller, Get, Put, Delete, Param, Body, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Param, Body, UseGuards, Req, ForbiddenException, Patch } from '@nestjs/common';
 import { UserService } from './tg_user.service';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { Request } from 'express';
-import { UpdateUserDTO, UserRole } from './dto/update-user-dto';
+import { UpdateUserDTO} from './dto/update-user.dto';
 import { User } from 'src/decorators/user.decorator';
+import { UserRole } from './dto/get-user.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -16,7 +17,7 @@ export class UserController {
     @User() user
   ) {
     const userId = user.userId; // из payload JWT
-    return this.userService.findById(userId);
+    return this.userService.findByUserId(userId);
   }
 
   // Получить пользователя по ID (только для самого пользователя или администратора)
@@ -31,23 +32,26 @@ export class UserController {
       throw new ForbiddenException('Access denied');
     }
 
-    return this.userService.findById(id);
+    return this.userService.findByUserId(id);
   }
 
   // Обновить пользователя
-  @Put(':id')
+  @Patch(':id')
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDTO,
     @User() user
   ) {
     const currentUserId = user.userId;
+    console.log(` async updateUser updateUserDto:${JSON.stringify(updateUserDto)}`);
+    console.log(` async updateUser id:${id}`);
+    console.log(` async updateUser user:${JSON.stringify(user)}`);
 
     if (currentUserId !== id && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
-    return this.userService.updateTelegramUser(id, updateUserDto);
+    return {user: await this.userService.updateTelegramUser(id, updateUserDto)};
   }
 
   // // Удалить пользователя

@@ -8,7 +8,7 @@
   max-width: 768px;
   min-height: 100vh;
   gap: 2em;
-  background-color: black;
+  background-color: var(--main-background-color);
   color: #f2f2f3;
   margin: 0;
   padding: 0;

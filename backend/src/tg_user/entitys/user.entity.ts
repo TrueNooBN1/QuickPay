@@ -1,8 +1,9 @@
 import { IsArray, isArray } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { UserRole } from '../dto/get-user.dto';
 
 @Entity('users')
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -33,9 +34,8 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column()
-  @IsArray()
-  roles: string[];
+  @Column("text", { array: true,default: [UserRole.USER]})
+  roles: UserRole[];
 
   // можно добавить refreshTokenHash если храним в БД
   @Column({ nullable: true })

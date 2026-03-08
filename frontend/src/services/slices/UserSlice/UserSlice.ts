@@ -9,13 +9,27 @@ import {
 } from '../../../utils/api';
 import type {
   // TLoginData,
-  TRegisterData,
+  // TRegisterData,
   TTelegramLoginData
 } from '../../../utils/api';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { 
+  createAsyncThunk,
+  createSlice,
+  //  isFulfilled,
+   } from '@reduxjs/toolkit';
 import { ReqStatus } from '../../../utils/types';
 import type { TUser } from '../../../utils/types';
-import { deleteCookie, setCookie } from '../../../utils/cookie';
+import { 
+  // deleteCookie,
+  setCookie
+ } from '../../../utils/cookie';
+
+export const UserRole = {
+  ADMIN: 'Admin',
+  USER: 'User'
+} as const;
+
+export type UserRole = typeof UserRole[keyof typeof UserRole];
 
 // export const registerUser = createAsyncThunk(
 //   'registerUser',
@@ -28,7 +42,9 @@ import { deleteCookie, setCookie } from '../../../utils/cookie';
 export const loginUser = createAsyncThunk(
   'loginUser',
   async (data: TTelegramLoginData, { rejectWithValue }) => {
+    console.log("loginUser");
     const reply = await loginTelegramUserApi(data);
+    console.log("reply " + reply);
     return reply.success ? reply : rejectWithValue(reply);
   }
 );
@@ -59,7 +75,7 @@ export const getUserData = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'updateUser',
-  async (data: Partial<TRegisterData>, { rejectWithValue }) => {
+  async (data: TUser, { rejectWithValue }) => {
     const reply = await updateUserApi(data);
     return reply.success ? reply : rejectWithValue(reply);
   }
@@ -116,11 +132,13 @@ export const UserSlice = createSlice({
       //   state.loginUserError = action.error.message;
       // })
       .addCase(loginUser.pending, (state) => {
+        console.log("loginUser.pending");
         state.isAuthChecked = false;
         state.isAuthenticated = false;
         state.loginUserRequestStatus = ReqStatus.Loading;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log("login isFulfilled");
         state.loginUserRequestStatus = ReqStatus.Success;
         state.isAuthChecked = true;
         state.isAuthenticated = true;
@@ -130,6 +148,7 @@ export const UserSlice = createSlice({
         state.loginUserError = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        console.log("login isRejected");
         state.loginUserRequestStatus = ReqStatus.Failed;
         state.loginUserError = action.error.message;
         state.isAuthChecked = true;
@@ -177,6 +196,8 @@ export const UserSlice = createSlice({
         state.loginUserRequestStatus = ReqStatus.Loading;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
+        console.log("updateUser.fulfilled");
+        console.log("updateUser.fulfilled user" + JSON.stringify(action.payload.user));
         state.loginUserRequestStatus = ReqStatus.Success;
         state.data = action.payload.user;
         state.loginUserError = null;

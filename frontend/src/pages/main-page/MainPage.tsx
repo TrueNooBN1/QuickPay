@@ -12,21 +12,41 @@ import { getRates, rateSelector, rateStatusSelector } from '../../services/slice
 import Preloader from '../../components/preloader/preloader';
 import OrderCard from '../../components/ordercard/OrderCard';
 import type { TOrder } from '../../utils/types';
+import { loginUser, userDataSelector, UserRole } from '../../services/slices/UserSlice/UserSlice';
 
 export const MainPage: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
 
-  useEffect(() => {
-    dispatch(getRates());
-  }, [dispatch]);
-
 
   const rates = useSelector(rateSelector);
-  const loading = useSelector(rateStatusSelector);
+  const loading = !rates?.rateIn || !rates?.rateOut;
 
-  // const [rateIn, setRateIn] = useState(80);//to globalStore
-  // const [rateOut, setRateOut] = useState(82);//toGlobalStore
+
+  const userData = useSelector(userDataSelector);
+
+  useEffect(() => {
+    // Если данные уже есть - ничего не делаем
+    if (rates?.rateIn && rates.rateOut) return;
+
+    // Функция для запроса
+    const fetchDataIfNeeded = () => {
+      dispatch(getRates());
+    };
+
+    // // Сразу выполняем первый запрос
+    // fetchDataIfNeeded();
+
+    // // Устанавливаем интервал
+    const intervalId = setInterval(fetchDataIfNeeded, 5000);
+
+    // Очищаем интервал при размонтировании или когда данные появятся
+    return () => clearInterval(intervalId);
+  }, [dispatch, rates]); // rates в зависимостях - интервал пересоздастся при изменении rates
+
+  console.log("const userData " + JSON.stringify(userData))
+  console.log("const rates " + JSON.stringify(rates))
+
 
   if (!rates) {
     return <Preloader/>
@@ -68,17 +88,18 @@ export const MainPage: FC = () => {
         О нас
       </Button>
 
-      <Button>
+      {/* <Button>
         <Link target='_blank' to={supportLink} className='link'>
           Поддержка
         </Link>
-      </Button>
+      </Button> */}
 
-      <Button onClick={()=>{
+      {userData?.roles && userData.roles.find((item)=>item === UserRole.ADMIN) && <Button onClick={()=>{
         navigate("/admin")
       }}>
         Админка
       </Button>
+      }   
       
     </Page>
   );

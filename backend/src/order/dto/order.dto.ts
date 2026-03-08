@@ -1,5 +1,3 @@
-//TODO реализовать DTO для /orders
-
 import {
   IsDate,
   IsEnum,
@@ -10,14 +8,14 @@ import {
 
 
 export enum TOrderType {
-  SELL = 'Sell',
-  BUY = 'Buy',
+  SELL = 'SELL',
+  BUY = 'BUY',
 }
 
 export enum TOrderStatus {
-  CREATED = 'created',
-  READY = 'ready',
-  DENIED = 'denied',
+  CREATED = 'CREATED',
+  READY = 'READY',
+  DENIED = 'DENIED',
 }
 
 export type TOrdersFilter = {
@@ -31,6 +29,32 @@ export type PatchOrderDTO = {
 }
 
 export class PostOrderDTO {
+  @IsString()
+  userId: string;
+
+  @IsString()
+  name: string;
+
+  @IsPhoneNumber()
+  phone: string;
+
+  @IsString()
+  wallet: string;
+
+  @IsNumber()
+  totalSum: number;
+
+  @IsNumber()
+  exchangeRate: number;
+
+  @IsNumber()
+  exchangeValue: number;
+
+  @IsEnum(TOrderType)
+  type: TOrderType;
+}
+
+export class GetOrderDTO {
   @IsString()
   id: string;
 
@@ -50,7 +74,13 @@ export class PostOrderDTO {
   status: TOrderStatus;
 
   @IsNumber()
-  amount: number;
+  totalSum: number;
+
+  @IsNumber()
+  exchangeRate: number;
+
+  @IsNumber()
+  exchangeValue: number;
 
   @IsEnum(TOrderType)
   type: TOrderType;

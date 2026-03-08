@@ -1,29 +1,45 @@
-import type { FC } from 'react';
+import { type FC } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Page } from '../Page';
-import type { TOrder } from '../../utils/types';
-import { OrdersList, type OrdersListProps } from '../../components/orderlist/OrderList';
-import OrderForm from '../../forms/OrderForm/OrderForm';
+import { TOrderType, type TOrder } from '../../utils/types';
+import { OrdersList} from '../../components/orderlist/OrderList';
+// import { useSelector } from 'react-redux';
+// import { userDataSelector } from '../../services/slices/UserSlice/UserSlice';
+import { apiUrl } from '../../const/const';
+import UpdateUserDataForm from '../../forms/OrderForm/UpdateUserDataForm';
 
 export const ProfilePage: FC = () => {
-//   const navigate = useNavigate();
+// //   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+//     useEffect(() => {
+//       dispatch(getUserData());
+//     }, [dispatch]);
+
+  // const userData = useSelector(userDataSelector);
+
   
   const orders: TOrder[] = [{
     _id: "1",
-    amount: 100,
+    exchangeRate: 100,
+    exchangeValue: 100,
+    totalSum: 100,
     createdAt: new Date().toISOString(),
     name: "userName",
     status: 'created',
-    type: 'Buy',
+    type: TOrderType.Buy,
+    phone: "983213821",
     userId: "2",
     wallet: "walletString"
   },{
     _id: "2",
-    amount: 1000,
+    exchangeRate: 1000,
+    exchangeValue: 1000,
+    totalSum: 1000,
     createdAt: new Date().toISOString(),
     name: "userName",
     status: 'created',
-    type: 'Sell',
+    type: TOrderType.Sell,
+    phone: "983213821",
     userId: "2",
     wallet: "walletString"
   },
@@ -31,7 +47,8 @@ export const ProfilePage: FC = () => {
 
   return (
   <Page>
-    <OrderForm/>
+    <UpdateUserDataForm
+    apiUrl={apiUrl}/>
     <h2>
         Заявки
     </h2>

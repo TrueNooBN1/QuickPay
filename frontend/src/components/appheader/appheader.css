@@ -1,6 +1,6 @@
 .app-header {
-  background-color: black;
-  border-bottom: 1px solid #eaeaea;
+  background-color: var(--main-background-color);
+  /* border-bottom: 3px solid var(--main-font-color); */
   height: 60px;
   width: 100%;
   max-width: 768px;
@@ -8,6 +8,16 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  color: var(--main-font-color)
+}
+.app-header:before {
+  content : "";
+  position: absolute;
+  left    : 10%;
+  bottom  : 0;
+  height  : 1px;
+  width   : 80%;  /* or 100px */
+  border-bottom: 3px solid var(--main-font-color);
 }
 
 /* .app-header--with-button { */
@@ -50,7 +60,7 @@
 .app-header__logo-text {
   font-size: 30px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--main-font-color);
 }
 
 .app-header__logo-text-disabled {

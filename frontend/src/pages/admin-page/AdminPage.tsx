@@ -1,29 +1,34 @@
 import type { FC } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Page } from '../Page';
-import type { TOrder } from '../../utils/types';
+import { TOrderType, type TOrder } from '../../utils/types';
 import { OrdersList} from '../../components/orderlist/OrderList';
-import OrderForm from '../../forms/OrderForm/OrderForm';
 
 export const AdminPage: FC = () => {
 //   const navigate = useNavigate();
   
   const orders: TOrder[] = [{
     _id: "1",
-    amount: 100,
+    exchangeRate: 100,
+    exchangeValue: 100,
+    totalSum: 100,
     createdAt: new Date().toISOString(),
     name: "userName",
     status: 'created',
-    type: 'Buy',
+    type: TOrderType.Buy,
+    phone: "983213821",
     userId: "2",
     wallet: "walletString"
   },{
     _id: "2",
-    amount: 1000,
+    exchangeRate: 1000,
+    exchangeValue: 1000,
+    totalSum: 1000,
     createdAt: new Date().toISOString(),
     name: "userName",
     status: 'created',
-    type: 'Sell',
+    type: TOrderType.Sell,
+    phone: "983213821",
     userId: "2",
     wallet: "walletString"
   },

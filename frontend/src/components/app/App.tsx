@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import './App.css'
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate, type To } from 'react-router-dom'
 import { useDispatch } from '../../services/store/store'
 // import styles from './App.css';
 // import * as styles from './App.css';
@@ -10,31 +10,63 @@ import { NotFound404 } from '../../pages/not-found-404';
 import { AboutPage } from '../../pages/about-page';
 import AppHeader from '../appheader/appheader';
 import { ExchangePage } from '../../pages/exchange-page/ExchangePage';
-import { getUserData } from '../../services/slices/UserSlice/UserSlice';
+import { getUserData, loginUser, userDataSelector } from '../../services/slices/UserSlice/UserSlice';
 import { Modal } from '../modal/Modal';
-import OrderForm from '../../forms/OrderForm/OrderForm';
 import { ProfilePage } from '../../pages/profile-page/ProfilePage';
 import { AdminPage } from '../../pages/admin-page/AdminPage';
+import { getRates, rateStatusSelector } from '../../services/slices/RateSlice/RateSlice';
+import type { TTelegramLoginData } from '../../utils/api';
+import { useSelector } from 'react-redux';
 
 function App() {
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const backgroundLocation = location.state && location.state.background;
+  const location = useLocation();
+	const navigate = useNavigate();
+	// const { getProducts } = useActionCreators(productsActions);
+	// const { authCheck, checkUserAuth } = useActionCreators(userActions);
+	const handleModalClose = (path: To | number) => () => navigate(path as To);
+
+  const loginData :TTelegramLoginData =  {
+    telegramId: "1"
+  }
+
+	// useEffect(() => {
+	// 	getRates();
+	// 	loginUser(loginData);
+	// }, [getRates]);
+
+	const locationState = location.state as { background?: Location; };
+	const background = locationState && locationState.background;
+
+  // const navigate = useNavigate();
+  // const location = useLocation();
+
+  // const backgroundLocation = location.state && location.state.background;
   const closeModal = () => {
-    navigate(backgroundLocation || '/');
+    navigate(background || '/');
   };
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    // dispatch(updateMarketData());
-    dispatch(getUserData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   // dispatch(updateMarketData());
+  //   dispatch(getUserData());
+  // }, [dispatch]);
+
+    const authData :TTelegramLoginData = {telegramId: "dsadsadsadsa"} ;
+
+    useEffect(() => {
+      dispatch(loginUser(authData));
+      dispatch(getRates());
+    }, [dispatch]);
+
+    // const userData = useSelector(userDataSelector);
+    // console.log("const userData " + JSON.stringify(userData))
+  
 
   return (
     <div className="app">
       <AppHeader />
-      <Routes location={backgroundLocation || location}>
+      <Routes location={background || location}>
         <Route path='/' element={<MainPage/> } />
         <Route path='/about' element={<AboutPage />} />
         <Route path='/exchange' element={<ExchangePage />} />
@@ -76,7 +108,7 @@ function App() {
         </Routes>
 
         {/* modalRoutes */}
-        {backgroundLocation && (
+        {background && (
           <Routes>
             {/* <Route
               path='/orders/:number'
@@ -92,7 +124,7 @@ function App() {
               path='/exchange/create'
               element={
                 <Modal title='Заказ' onClose={closeModal}>
-                  <OrderForm />
+                  {/* <OrderForm /> */}
                 </Modal>
               }
             />

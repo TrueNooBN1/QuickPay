@@ -18,10 +18,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.userService.findById(payload.sub);
+    const user = await this.userService.findByUserId(payload.sub);
+    console.log("private generateTokens(user: GetUserDTO)", payload)
+    console.log("private generateTokens(user: GetUserDTO) user", user)
+
     if (!user) {
       throw new UnauthorizedException();
     }
-    return { userId: payload.sub, email: payload.email };
+    return { userId: payload.sub, roles: payload.roles };
   }
 }

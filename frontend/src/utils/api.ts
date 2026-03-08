@@ -1,11 +1,18 @@
 import { apiUrl } from '../const/const';
 import { setCookie, getCookie } from './cookie';
-import type { TOrder, TOrdersData, TRate, TUser } from './types';
+import type { TNewOrder, TOrder, TOrdersData, TRate, TUser } from './types';
 
 const URL = apiUrl;
 
-const checkResponse = <T>(res: Response): Promise<T> =>
-  res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
+const checkResponse = async <T>(res: Response): Promise<T> => {
+  const data = await res.json();
+  if (!res.ok) {
+    console.log("error", data);
+    return Promise.reject(data);
+  }
+  console.log("res.ok true", data);
+  return data;
+}
 
 type TServerResponse<T> = {
   success: boolean;
@@ -70,16 +77,18 @@ type TNewOrderResponse = TServerResponse<{
 }>;
 
 export const getRateApi = ()=>
-  fetchWithRefresh<TRateResponse>(`${URL}/rates`, {
+  fetch(`${URL}/order/rates`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
-  }).then((data) => {
-    if (data?.success) return data.rates;
-    return Promise.reject(data);
-  });
+  })
+  .then((res) => checkResponse<TRateResponse>(res))
+  .then((data) => {
+      if (data?.success) return data;
+      return Promise.reject(data);
+    });
 
 
 export const getOrdersApi = () =>
@@ -94,16 +103,14 @@ export const getOrdersApi = () =>
     return Promise.reject(data);
   });
 
-export const orderExchangeApi = (data: TOrder) =>
-  fetchWithRefresh<TNewOrderResponse>(`${URL}/orders`, {
+export const orderExchangeApi = (data: TNewOrder) =>
+  fetchWithRefresh<TNewOrderResponse>(`${URL}/order`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit,
-    body: JSON.stringify({
-      order: data
-    })
+    body: JSON.stringify(data)
   }).then((data) => {
     if (data?.success) return data;
     return Promise.reject(data);
@@ -141,7 +148,7 @@ export const registerUserApi = (data: TRegisterData) =>
     },
     body: JSON.stringify(data)
   })
-    .then((res) => checkResponse<TAuthResponse>(res))
+    .then((res) => { console.log("udsayiudsaydisuaydsai" +res);return checkResponse<TAuthResponse>(res)})
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
@@ -153,7 +160,7 @@ export type TLoginData = {
 };
 
 export type TTelegramLoginData = {
-  id: string;
+  telegramId: string;
 };
 
 export const loginUserApi = (data: TLoginData) =>
@@ -180,6 +187,8 @@ export const loginTelegramUserApi = (data: TTelegramLoginData) =>
   })
     .then((res) => checkResponse<TAuthResponse>(res))
     .then((data) => {
+      console.log("data succes" + data.success); 
+      console.log("data" + JSON.stringify(data)); 
       if (data?.success) return data;
       return Promise.reject(data);
     });
@@ -217,19 +226,23 @@ type TUserResponse = TServerResponse<{ user: TUser }>;
 export const getUserApi = () =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
     headers: {
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
   });
 
-export const updateUserApi = (user: Partial<TRegisterData>) =>
-  fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
+export const updateUserApi = (user: TUser) =>{
+  const { id, roles, ...updateData } = user;
+  console.log(`export const updateUserApi = (user: ${JSON.stringify(user)})`);
+  
+  return fetchWithRefresh<TUserResponse>(`${URL}/users/${user.id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
+      authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit,
-    body: JSON.stringify(user)
+    body: JSON.stringify(updateData)
   });
+}
 
 export const logoutApi = () =>
   fetch(`${URL}/auth/logout`, {

@@ -1,36 +1,55 @@
 import { Module } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as path from 'node:path';
-import { configProvider } from './app.config.provider';
-import { OrderController } from './order/order.controller';
-import { OrderService } from './order/order.service';
-import { DatabaseModule } from './database-module/database-module.module';
-import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { appConfig } from './config/app.config';
+import { IJwtConfig, jwtConfig } from './config/jwt.config';
+import { dbConfig } from './config/db.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+// import path from 'path';
+import { join } from 'path';
+import { TelegramAuthModule } from './tg_auth/tg_auth.module';
+import { TelegramUserModule } from './tg_user/tg_user.module';
+import { OrderModule } from './order/order.module';
+import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      cache: true,
+      load: [appConfig, jwtConfig, dbConfig],
+    }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [dbConfig.KEY],
+      useFactory: (db: ConfigType<typeof dbConfig>) => db,
     }),
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
     }),
-    DatabaseModule.register(configProvider.useValue.database.driver),
-    PassportModule,
+
+
     JwtModule.registerAsync({
-      useFactory: (config: ConfigService) => ({
-        secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRES_IN') },
+      global: true,
+      imports: [ConfigModule],
+      inject: [jwtConfig.KEY],
+      useFactory: (config: IJwtConfig) => ({
+        secret: config.secret,
+        signOptions: {
+          expiresIn: config.expiresIn,
+        },
       }),
-      inject: [ConfigService],
     }),
+
+    // WebSocketClientModule,
+
+    TelegramUserModule,
+    TelegramAuthModule,
+    OrderModule,
   ],
-  controllers: [OrderController],
-  providers: [configProvider, OrderService, ],
-  exports: [configProvider],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }

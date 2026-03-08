@@ -5,9 +5,9 @@ import {
 } from './../../../utils/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ReqStatus } from './../../../utils/types';
-import type { TOrder } from './../../../utils/types';
+import type { TNewOrder, TOrder } from './../../../utils/types';
 
-export const getOrders = createAsyncThunk('orders', async () => getOrdersApi());
+export const getOrders = createAsyncThunk('order', async () => getOrdersApi());
 
 export const getOrderByNumber = createAsyncThunk(
   'orderByNumber',
@@ -16,7 +16,7 @@ export const getOrderByNumber = createAsyncThunk(
 
 export const submitOrder = createAsyncThunk(
   'submitOrder',
-  async (order: TOrder, { rejectWithValue }) => {
+  async (order: TNewOrder, { rejectWithValue }) => {
     const reply = await orderExchangeApi(order);
     if (!reply.success) rejectWithValue(reply);
     return reply;

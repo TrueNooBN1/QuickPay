@@ -1,18 +1,22 @@
 .text{
-  color: white;
+  color: var(--main-font-widget-color);
   font-size: 20px;
 }
 
 .formatted-text{
   white-space: pre-line;
+  color: var(--main-font-widget-color);
 }
 
 .rate-container{
-  border: 2px solid white;
+  /* border: 2px solid white; */
+  background-color: var(--main-background-widget-color);
+  color: var(--main-font-widget-color);
   border-radius: 10px;
   padding: 10px;
   min-width: 40%;
   max-width: 50%;
+  color: var()
 }
 
 .rate-container:hover{

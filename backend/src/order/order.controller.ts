@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { PatchOrderDTO, PostOrderDTO, TOrdersFilter} from './dto/order.dto';
 import { JwtAuthGuard } from 'src/guards/jwt.guard';
@@ -10,48 +10,113 @@ export class OrderController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  postOrder(
+  async postOrder(
     @Body() body: PostOrderDTO,
     @User() user
   ) {
     console.log(
-      `OrderController::postOrder(@Body() body: ${JSON.stringify(body)})`,
+      `OrderController::postOrder(@Body() body: ${JSON.stringify(body)} @User() ${user})`,
     );
-    return this.orderService.postOrder(body);
+    
+    try {
+
+      const orderResponse = await this.orderService.postOrder(body);
+      return orderResponse;
+
+    } catch (error) {
+      console.log(
+        'OrderController::postOrder(@Body() body,s @User() user) drop with error: ',
+        error,
+      );
+      throw new BadRequestException({ message: error.message });
+    }
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  getOrders(
+  async getOrders(
     @Body() body: TOrdersFilter,
     @User() user
   ) {
     console.log(
-      `OrderController::postOrder(@Body() body: ${JSON.stringify(body)})`,
+      `OrderController::postOrder(@Body() body: ${JSON.stringify(body)} @User() ${user})`,
     );
-    return this.orderService.getOrders(user.userId, body);
+    try {
+      if (body.pageSize === 0 || body.pageNumber < 0) {
+        throw new BadRequestException("Не заданы параметры фильтра");
+      }
+      const orderResponse = await this.orderService.getOrders(user.userId, body);
+
+      return orderResponse;
+    } catch (error) {
+      console.log(
+        'OrderController::getOrders(@Body() body: TOrdersFilter, @User() user drop with error: ',
+        error,
+      );      
+      throw new BadRequestException({ message: error.message });
+    }
   }
+
+  
+  @Get('rates')
+  async getRates(){
+    console.log("OrderController::getRates()")
+    return await this.orderService.getRates();
+  } 
+
+
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  getOrder(
+  async getOrder(
     @Param() id: string,
   ) {
     console.log(
       `OrderController::getOrder(@Body() id: ${id})`,
     );
-    return this.orderService.getOrder(id);
+    try {
+      if (id.length === 0) {
+        throw new BadRequestException("Не заданы параметры фильтра");
+      }
+      const orderResponse = await this.orderService.getOrder(id);
+
+      return orderResponse;
+    } catch (error) {
+      console.log(
+        'OrderController::getOrder(@Body() id: string) drop with error: ',
+        error,
+      );      
+      throw new BadRequestException({ message: error.message });
+    }
   }
+
 
   @Patch()
   @UseGuards(JwtAuthGuard)
-  patchOrderStatus(
+  async patchOrderStatus(
     @Body() body: PatchOrderDTO,
     @User() user
   ){
     console.log(
-      `OrderController::patchOrderStatus(@Body() body: ${JSON.stringify(body)})`,
+      `OrderController::patchOrderStatus(@Body() body: PatchOrderDTO, @User() user): ${JSON.stringify(body)} @User() ${user})`,
     );
-    return this.orderService.patchOrder(body);
+    try {
+      if (body.id.length === 0 || body.status.length === 0) {
+        throw new BadRequestException("Не заданы параметры фильтра");
+      }
+
+      const orderResponse = await this.orderService.patchOrderStatus(body.id, body.status);
+
+      return orderResponse;
+    } catch (error) {
+      console.log(
+        'OrderController::patchOrderStatus(@Body() body: PatchOrderDTO, @User() user) drop with error: ',
+        error,
+      );      
+      throw new BadRequestException({ message: error.message });
+    }
   }
+
+
+  
 }
