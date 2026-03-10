@@ -1,5 +1,6 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
+  /* font-family:Arial, Helvetica, sans-serif; */
   line-height: 1.5;
   font-weight: 400;
 
@@ -7,13 +8,29 @@
   color: rgba(255, 255, 255, 1);
   background-color: #242424;
 
+  --font-size-small: 10px;
+  --font-size-medium: 14px;
+  --font-size-large: 20px;
+  --font-size-xxl: 30px;
   --main-color: #00412F;
   --secondary-color: #71f89A;
 
-  --main-background-color: var(--main-color);
+  --neon-main:#39ff86;
+  --neon-soft:#8fffba;
+  --neon-light:#eafff2;
+
+  --button-font: "MontserratSemi-bold";
+
+  /* --main-background-color: var(--main-color); */
+  --main-background-color: rgba(0,65,47,0.75);
   --main-font-color: var(--secondary-color);
   --main-background-widget-color: var(--secondary-color);
   --main-font-widget-color: var(--main-color);
+  --main-widget-background-color: transparent;
+
+  --bg: var(--main-color);
+  --neon: var(--secondary-color);
+  --border-radius: 40px;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,7 +40,7 @@
 }
 
 a {
-  font-weight: 500;
+  font-weight: 600;
   color: #646cff;
   text-decoration: inherit;
 }
@@ -49,7 +66,7 @@ button {
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
@@ -63,6 +80,19 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.full-width {
+  min-width: 80%;
+  max-width: 80%;
+}
+
+.half-width {
+    min-width: 45%;
+}
+
+.disabled {
+    display: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -74,4 +104,11 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+@font-face {
+  font-family: "MontserratSemi-bold";   /*Can be any text*/
+  src: local("Montserrat Semi-bold"),
+    url("./assets/fonts/Montserrat-SemiBold.woff") format("woff");
 }

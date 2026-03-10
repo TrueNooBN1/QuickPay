@@ -4,43 +4,77 @@
 import { useEffect, useState } from 'react';
 import type {FC} from "react"
 import { useSelector, useDispatch } from '../../services/store/store';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Page} from '../Page/Page';
 import Button from '../../components/button/button';
 import "./ExchangePage.css"
-import Text from '../../components/text/text';
 import Input from '../../components/input/input';
 import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlice';
 import Preloader from '../../components/preloader/preloader';
-import { ordersStatusSelector } from '../../services/slices/OrderSlice/OrderSlice';
+import { updateOrder } from '../../services/slices/OrderSlice/OrderSlice';
 import { userDataSelector } from '../../services/slices/UserSlice/UserSlice';
-import RequestUserDataForm from '../../forms/OrderForm/OrderUserDataForm';
-
+import { TOrderType, type TNewOrder } from '../../utils/types';
+import RatePresenter from '../../components/rate-presenter/rate-presenter';
+import TabButton from '../../components/button/tab-button/tab-button';
 
 export const ExchangePage: FC = () => {
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+  console.log("background location" + JSON.stringify(location))
+
 
   const rates = useSelector(rateSelector);
   const userData = useSelector(userDataSelector);
-  const orderRequest = useSelector(ordersStatusSelector);  
+  // const orderRequest = useSelector(ordersStatusSelector);  
+  
+  const [selectedType, setSelectedType] = useState<TOrderType>(TOrderType.Sell);
 
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [selectedType, setSelectedType] = useState(0);
-  const [btnClicked, setBtnClicked] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [countedValue, setCountedValue] = useState(NaN);
+  const [exchangeValue, setExchangeValue] = useState('');
+  const [totalSumValue, setTotalSumValue] = useState('');
+  // const [countedValue, setCountedValue] = useState<TExchangePageCalculator>({sellValue: NaN, buyValue:NaN});
 
-  const handleValueChange = (newValue: string) => {
-    setInputValue(newValue);
-    setCountedValue(Number(newValue));
+  const handleTotalSumValueChange = (newValue: string) => {
+    if(newValue.length === 0){
+      setTotalSumValue("");
+      setExchangeValue("");
+      return;
+    }
+    if(rates){
+      setTotalSumValue(newValue);
+        if(selectedType === TOrderType.Sell){
+          const updatedExchangeValue = Number(newValue) * rates?.rateIn;
+          setExchangeValue(updatedExchangeValue.toFixed(2));
+        }else if(selectedType === TOrderType.Buy){
+          const updatedExchangeValue = Number(newValue) / rates?.rateOut;
+          setExchangeValue(updatedExchangeValue.toFixed(2));
+        }
+    }
+  };
+  
+  const handleExchangeValueChange = (newValue: string) => {
+    if(newValue.length === 0){
+      setTotalSumValue("");
+      setExchangeValue("");
+      return;
+    }
+    if(rates){
+      setExchangeValue(newValue);
+        if(selectedType === TOrderType.Sell){
+          const updatedExchangeValue = Number(newValue) / rates?.rateIn;
+          setTotalSumValue(updatedExchangeValue.toFixed(2));
+        }else if(selectedType === TOrderType.Buy){
+          const updatedExchangeValue = Number(newValue) * rates?.rateOut;
+          setTotalSumValue(updatedExchangeValue.toFixed(2));
+        }
+    }
   };
 
-  const updateType = (type: number) =>{
+  const updateType = (type: TOrderType) =>{
     setSelectedType(type)
-    setInputValue("");
-    setBtnClicked(false);
+    setExchangeValue("")
+    setTotalSumValue("")
   }
 
   useEffect(() => {
@@ -52,69 +86,70 @@ export const ExchangePage: FC = () => {
     return <Preloader/>
   }
 
+  const onClick =()=>{
+    if(exchangeValue.length != 0 && userData){
+      navigate("/exchange/create", {
+        state: { background: location } // передаём объект, а не строку
+      });
+
+      const newOrder:TNewOrder={
+        userId: userData?.id,
+        exchangeRate: selectedType === TOrderType.Buy ? rates.rateOut : rates.rateIn,
+        exchangeValue: Number(exchangeValue),
+        phone: userData.phone? userData.phone : "",
+        name: userData.name? userData.name : "",
+        wallet: userData.wallet? userData.wallet : "",
+        type: selectedType,
+        totalSum: Number(totalSumValue),
+      }
+      console.log(newOrder);
+      dispatch(updateOrder(newOrder));
+    }
+  }
+
+
 
   return (
     <Page>      
-      <div className='container'>
-        <Button 
+      <div className='tabs full-width'>
+        <TabButton 
           onClick={()=>{
-            updateType(0);
+            updateType(TOrderType.Sell);
           }}
-          className={(selectedType === 0) ? "button-checked" : ""}
-        >
-            Покупка
-        </Button>      
-
-        <Button 
-          onClick={()=>{
-            updateType(1);
-          }}
-          className={(selectedType === 1) ? "button-checked" : ""}
+          className={`half-width ${(selectedType === TOrderType.Sell) ? "active" : ""}`}
           >
             Продажа
-        </Button>      
+        </TabButton>      
+
+        <TabButton 
+          onClick={()=>{
+            updateType(TOrderType.Buy);
+          }}
+          className={`half-width ${(selectedType === TOrderType.Buy) ? "active" : ""}`}
+        >
+            Покупка
+        </TabButton>      
       </div>
 
-      <div>
-        <Text>
-          {
-            selectedType === 0 ? 
-              `Покупка 1₮ за ${rates.rateIn}₽` :
-              `Продажа ${rates.rateOut}₽ за 1₮`
-          }
-        </Text>
-        <Text>
-          Введите сумму для обмена
-        </Text>
-        <Input onValueChange={handleValueChange} unit={selectedType === 0 ? "₽" : "₮"} value={inputValue}></Input>
+      <RatePresenter 
+        className={'full-width'}
+        type={selectedType}
+        rate={selectedType === TOrderType.Buy?
+                  rates.rateOut:
+                  rates.rateIn
+             }/>
 
-        {selectedType === 0 ?
-          <Text>
-            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue/rates.rateIn).toFixed(2)} ₮`}
-            {/* {`Вы получите ${(countedValue/rates.rateOut).toFixed(2)} ₮`} */}
-          </Text>
-         :
-          <Text>
-            {inputValue.length === 0 ? "" : `Вы получите ${(countedValue * rates.rateOut).toFixed(2)} ₽`}
-            {/* {`Вы получите ${(countedValue * rates.rateIn).toFixed(2)} ₽`} */}
-          </Text>
-        }
-      </div>
+      <Input onValueChange={handleExchangeValueChange} unit={selectedType === TOrderType.Sell ? "Руб." : "USDT"} value={exchangeValue} className='full-width'/>
 
-      {/* <Button onClick={()=>navigate("/exchange/create")}>
+      <Input onValueChange={handleTotalSumValueChange} unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} value={totalSumValue} className='full-width'/>
+
+      <Button 
+        className={exchangeValue.length === 0 ? "disabled" : ""} 
+        onClick={onClick}
+      >
         Оформить заявку
-      </Button> */}
-      {!btnClicked &&
-        <Button onClick={()=>{if(inputValue.length > 0) setBtnClicked(true)}}>
-          Оформить заявку
-        </Button>
-      }
+      </Button>
       
-      {btnClicked && (
-      <RequestUserDataForm/>
-        
-      )}
-
     </Page>
   );
 };

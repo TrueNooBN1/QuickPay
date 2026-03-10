@@ -5,25 +5,27 @@ import "./input.css"
 interface InputProps {
   onValueChange: (value: string) => void; // Колбэк для передачи значения наверх
   unit?:string;
-  value?: string;
+  value?:string;
+  className?:string;
+  placeholder?: string;
 }
 
-const Input = ({ onValueChange, unit = "", value = ""}: InputProps) => {
+const Input = ({ onValueChange, unit = "", value = "", className, placeholder}: InputProps) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onValueChange(newValue);
   };
 
   return (
-    <div className="input-unit-container">
+    <div className={`input-unit-container ${className}`}>
       <input
         type="number"
         value={value}
         onChange={handleChange}
-        placeholder="Введите сумму..."
+        placeholder={placeholder ? placeholder : `Введите сумму обмена`}
         className='input'
       />
-      <span className="input-unit__label">{unit}</span>
+      <span className="input-unit__label">{`${unit}`}</span>
     </div>
     
   );

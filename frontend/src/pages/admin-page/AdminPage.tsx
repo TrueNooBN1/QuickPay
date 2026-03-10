@@ -1,38 +1,24 @@
-import type { FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Page } from '../Page';
-import { TOrderType, type TOrder } from '../../utils/types';
+import { type TOrdersFilter } from '../../utils/types';
 import { OrdersList} from '../../components/orderlist/OrderList';
+import { useSelector } from 'react-redux';
+import { getOrders, ordersSelector } from '../../services/slices/OrderSlice/OrderSlice';
+import Input from '../../components/input/input';
+import TextInput from '../../components/input/text-input';
+import Text from '../../components/text/text';
+import { useDispatch } from '../../services/store/store';
+import Button from '../../components/button/button';
 
 export const AdminPage: FC = () => {
 //   const navigate = useNavigate();
-  
-  const orders: TOrder[] = [{
-    _id: "1",
-    exchangeRate: 100,
-    exchangeValue: 100,
-    totalSum: 100,
-    createdAt: new Date().toISOString(),
-    name: "userName",
-    status: 'created',
-    type: TOrderType.Buy,
-    phone: "983213821",
-    userId: "2",
-    wallet: "walletString"
-  },{
-    _id: "2",
-    exchangeRate: 1000,
-    exchangeValue: 1000,
-    totalSum: 1000,
-    createdAt: new Date().toISOString(),
-    name: "userName",
-    status: 'created',
-    type: TOrderType.Sell,
-    phone: "983213821",
-    userId: "2",
-    wallet: "walletString"
-  },
-  ];
+
+  const dispatch = useDispatch();  
+  const orders = useSelector(ordersSelector);
+  const [commission, setCommissionValue] = useState<string>();
+  const [wallet, setWalletValue] = useState<string>();
+  const [page, setPageValue] = useState<number>(0);
 
   const onAccept = (id: string) => {
     console.log(`accept ${id}`);
@@ -40,19 +26,66 @@ export const AdminPage: FC = () => {
   const onDecline = (id: string) => {
     console.log(`decline ${id}`);
   }
+  const handleCommissionChange = (newValue: string) => {
+    setCommissionValue(newValue);
+  };
+  const handleWalletChange = (newValue: string) => {
+    setWalletValue(newValue);
+  };
+
+  const filter: TOrdersFilter = {
+    pageNumber: 0,
+    pageSize: 10,
+  }
+
+  useEffect(()=>{
+    dispatch(getOrders(filter));
+  }, [dispatch]);
 
   return (
   <Page>
-    <div>
+    <Text>
       Установить комиссию(%)
-    </div>
-    <div>
+    </Text>
+    <Input
+     onValueChange={handleCommissionChange}
+     unit={"%"}
+     value={commission}
+     className='full-width'
+     placeholder='Установите комиссию'/>
+    <Button onClick={()=>{}}>
+      Сохранить
+    </Button>
+
+
+    <Text>
       Установить кошелек для покупки
-    </div>
-    <div>
+    </Text>
+    <TextInput
+     onValueChange={handleWalletChange}
+     unit={""}
+     value={wallet}
+     className='full-width'
+     placeholder='Установите кошелек'/>
+     <Button onClick={()=>{}}>
+      Сохранить
+     </Button>
+
+    <Text>
       Установить фильтр для заявок
-    </div>
-    <OrdersList orderByDate={orders} onAccept={onAccept} onDecline={onDecline}>
-    </OrdersList>
+    </Text>
+     <Button onClick={()=>{}}>
+      Применить
+     </Button>
+    
+
+    
+    {orders && <OrdersList orderByDate={orders} onAccept={onAccept} onDecline={onDecline}>
+    </OrdersList>}
+    { (orders && (page+1) * filter.pageSize < orders?.total) && 
+        <Button onClick={()=>setPageValue(page + 1)}>
+          Load More
+        </Button>
+    }
   </Page>
 )};

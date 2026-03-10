@@ -15,7 +15,7 @@ const Button: FC<ButtonProps> = ({
   className = '' 
 }) => {
   return (
-    <button className={`button + ${className}`} onClick={onClick}>
+    <button className={`button ${className}`} onClick={onClick}>
       {children}
     </button>
   );

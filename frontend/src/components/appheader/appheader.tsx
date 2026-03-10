@@ -26,7 +26,7 @@ const AppHeader: FC<AppHeaderProps> = ({ className = '' }) => {
           onClick={e => {e.preventDefault(); handleHomeClick()}}
         >
           <div className="app-header__logo">
-            <span className="app-header__logo-text">QuickPay</span>
+            <span className="app-header__logo-text"></span>
           </div>
         </Link>
       </div>

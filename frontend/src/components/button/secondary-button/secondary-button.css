@@ -1,0 +1,25 @@
+.secondary-button {
+  /* margin-top:20px; */
+  text-align:center;
+  color:var(--neon);
+  font-weight: 400;
+  opacity:0.8;
+  cursor:pointer;
+  background-color: transparent;
+  font-size: var(--font-size-large);
+  font-family: var(--button-font), sans-serif;
+}
+
+.secondary-button:hover{
+  border: none;
+}
+
+.secondary-button:active{
+  border: none;
+}
+
+.secondary-button:focus-visible,
+.secondary-button:focus{
+  border: none;
+  outline: none;
+}

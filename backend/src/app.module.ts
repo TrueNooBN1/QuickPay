@@ -43,7 +43,7 @@ import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.mod
       }),
     }),
 
-    // WebSocketClientModule,
+    WebSocketClientModule,
 
     TelegramUserModule,
     TelegramAuthModule,

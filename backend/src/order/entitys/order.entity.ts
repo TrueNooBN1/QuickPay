@@ -21,13 +21,13 @@ export class OrderEntity {
   @Column()
   status: string;
 
-  @Column()
+  @Column({type:'float'})
   totalSum: number;
 
-  @Column()
+  @Column({type:'float'})
   exchangeRate: number;
 
-  @Column()
+  @Column({type:'float'})
   exchangeValue: number;
 
   @Column()

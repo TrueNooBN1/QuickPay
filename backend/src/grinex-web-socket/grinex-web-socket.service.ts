@@ -50,7 +50,7 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
   private handleMessage(data: WebSocket.Data) {
     try {
       const rawData = JSON.parse(data.toString());
-      console.log('📥 Received data:', rawData);
+      // console.log('📥 Received data:', rawData);
 
       const messageKey = Object.keys(rawData)[0];
       const messageData = rawData[messageKey];
@@ -75,11 +75,11 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
 
     newPairs.forEach(pair => {
       if (exchangers[pair]) {
-        console.log(`📊 ${pair}:`, {
-          asksCount: exchangers[pair].ask?.length || 0,
-          bidsCount: exchangers[pair].bid?.length || 0,
-          price: exchangers[pair].price
-        });
+        // console.log(`📊 ${pair}:`, {
+        //   asksCount: exchangers[pair].ask?.length || 0,
+        //   bidsCount: exchangers[pair].bid?.length || 0,
+        //   price: exchangers[pair].price
+        // });
 
         // Здесь можно сохранять данные в базу или отправлять через EventEmitter
         this.orderRepository.setRate(exchangers[pair].price.usdta7a5, exchangers[pair].price.a7a5usdt);//уточнить момент

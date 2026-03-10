@@ -1,4 +1,14 @@
 import React from 'react';
+import "../../components/button/button.css"
+import Button from '../../components/button/button';
+
+export type TUserInfoDataFormInputs = {
+  name: string,
+  wallet: string,
+  phone:string
+}
+
+
 
 interface FormSubmitButtonProps {
   isSubmitting: boolean;
@@ -18,7 +28,7 @@ const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
       <button 
         type="submit" 
         disabled={isSubmitting} 
-        className='button'
+        className='button full-width'
       >
         {isSubmitting ? 'Отправка...' : children}
       </button>

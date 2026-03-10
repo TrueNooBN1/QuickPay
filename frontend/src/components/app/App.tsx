@@ -11,12 +11,16 @@ import { AboutPage } from '../../pages/about-page';
 import AppHeader from '../appheader/appheader';
 import { ExchangePage } from '../../pages/exchange-page/ExchangePage';
 import { getUserData, loginUser, userDataSelector } from '../../services/slices/UserSlice/UserSlice';
-import { Modal } from '../modal/Modal';
+import { Modal } from '../../forms/modal/modal';
 import { ProfilePage } from '../../pages/profile-page/ProfilePage';
 import { AdminPage } from '../../pages/admin-page/AdminPage';
 import { getRates, rateStatusSelector } from '../../services/slices/RateSlice/RateSlice';
 import type { TTelegramLoginData } from '../../utils/api';
 import { useSelector } from 'react-redux';
+import OrderUserDataForm from '../../forms/OrderForm/OrderUserDataForm';
+import UpdateUserDataForm from '../../forms/OrderForm/UpdateUserDataForm';
+import "./../../assets/fonts/Montserrat-SemiBold.woff";
+import AppFooter from '../appfooter/appfooter';
 
 function App() {
 
@@ -25,10 +29,6 @@ function App() {
 	// const { getProducts } = useActionCreators(productsActions);
 	// const { authCheck, checkUserAuth } = useActionCreators(userActions);
 	const handleModalClose = (path: To | number) => () => navigate(path as To);
-
-  const loginData :TTelegramLoginData =  {
-    telegramId: "1"
-  }
 
 	// useEffect(() => {
 	// 	getRates();
@@ -52,7 +52,7 @@ function App() {
   //   dispatch(getUserData());
   // }, [dispatch]);
 
-    const authData :TTelegramLoginData = {telegramId: "dsadsadsadsa"} ;
+    const authData :TTelegramLoginData = {telegramId: "213123321"} ;
 
     useEffect(() => {
       dispatch(loginUser(authData));
@@ -61,6 +61,7 @@ function App() {
 
     // const userData = useSelector(userDataSelector);
     // console.log("const userData " + JSON.stringify(userData))
+    // console.log("background location" + JSON.stringify(background))
   
 
   return (
@@ -110,27 +111,25 @@ function App() {
         {/* modalRoutes */}
         {background && (
           <Routes>
-            {/* <Route
-              path='/orders/:number'
-              element={
-                <ProtectedRoute onlyUnAuth={false}>
-                  <Modal title='Заказ' onClose={closeModal}>
-                    <OrderInfo />
-                  </Modal>
-                </ProtectedRoute>
-              }
-            /> */}
             <Route
               path='/exchange/create'
               element={
-                <Modal title='Заказ' onClose={closeModal}>
-                  {/* <OrderForm /> */}
+                <Modal title='Укажите информацию' onClose={closeModal}>
+                  <OrderUserDataForm/>
+                </Modal>
+              }
+            />
+            <Route
+              path='/profile/edit'
+              element={
+                <Modal title='Информация' onClose={closeModal}>
+                  <UpdateUserDataForm/>
                 </Modal>
               }
             />
           </Routes>
         )}
-      {/* <AppFooter /> */}
+      <AppFooter />
     </div>
   )
 }

@@ -1,24 +1,70 @@
-.button{
+/* .button{
   text-align: center;
   width: 80%;
-  background-color: var(--main-background-color);
-  border: 1px solid white;
+  border: 1px solid var(--main-font-color);
   border-radius: 10px;
-  font-size: 20px;
+  font-size: var(--font-size-large);
+  border: 1px solid var(--main-font-color);
   background-color: var(--main-background-color);
   color: var(--main-font-color);
+} */
+.button {
+  font-family: var(--button-font), sans-serif;
+  padding: 16px 60px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #71f89a;
+  background: transparent;
+
+  border: 2px solid #71f89a;
+  border-radius:var(--border-radius);
+
+  cursor: pointer;
+
+  /* плавность */
+  transition: all 0.3s ease;
+
+  /* неоновое свечение */
+  box-shadow:
+    0 0 10px rgba(113,248,154,0.6),
+    inset 0 0 10px rgba(113,248,154,0.3);
 }
 
 .button:hover{
-  box-shadow: 2px 4px 4px white;
-  border: 1px solid white;
+  /* box-shadow: 0px 0px 0px white; */
+  /* border: 1px solid var(--main-background-color); */
+  /* background-color: var(--main-font-color); */
+  /* color: var(--main-background-color); */
+
+  border: none;
+  background: rgba(113,248,154,0.1);
+
+  box-shadow:
+    0 0 15px rgba(113,248,154,0.9),
+    0 0 30px rgba(113,248,154,0.6),
+    inset 0 0 10px rgba(113,248,154,0.4);
 }
 
 .button:active{
-  background-color: red;
+  border: none;
+  /* border: 1px solid var(--main-background-color); */
+  /* background-color: var(--main-font-color); */
+  /* color: var(--main-background-color); */
+  transition: 0.5s;
+}
+
+.button:focus-visible,
+.button:focus{
+  border: none;
+  outline: none;
+  /* outline: 3px solid var(--main-background-color);  */
+  /* background-color: var(--main-font-color); */
+  /* color: var(--main-background-color); */
   transition: 0.5s;
 }
 
 .button-checked{
-  background-color: red;
+  border: 1px solid var(--main-background-color);
+  /* background-color: var(--main-font-color); */
+  /* color: var(--main-background-color); */
 }

@@ -1,0 +1,6 @@
+.app-footer{
+  height: 100px;
+  background-color: var(--main-background-color);
+  z-index: 1;
+  width: 100%;
+}

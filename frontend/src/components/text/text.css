@@ -1,4 +1,4 @@
 .text{
   color: var(--main-font-color);
-  font-size: 20px;
+  font-size: var(--font-size-large);
 }

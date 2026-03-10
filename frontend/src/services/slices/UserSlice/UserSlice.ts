@@ -132,13 +132,13 @@ export const UserSlice = createSlice({
       //   state.loginUserError = action.error.message;
       // })
       .addCase(loginUser.pending, (state) => {
-        console.log("loginUser.pending");
+        // console.log("loginUser.pending");
         state.isAuthChecked = false;
         state.isAuthenticated = false;
         state.loginUserRequestStatus = ReqStatus.Loading;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("login isFulfilled");
+        // console.log("login isFulfilled");
         state.loginUserRequestStatus = ReqStatus.Success;
         state.isAuthChecked = true;
         state.isAuthenticated = true;
@@ -148,7 +148,7 @@ export const UserSlice = createSlice({
         state.loginUserError = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.log("login isRejected");
+        // console.log("login isRejected");
         state.loginUserRequestStatus = ReqStatus.Failed;
         state.loginUserError = action.error.message;
         state.isAuthChecked = true;

@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import UserInfoDataFormFields, { type TUserInfoDataFormInputs } from '../data-forms/OrderInfoDataForm/UserInfoDataForm';
-import OrderFormSubmitButton from './FormSubmitButton';
+import FormSubmitButton, { type TUserInfoDataFormInputs } from './FormSubmitButton';
 import "./UserDataForm.css"
 import Text from '../../components/text/text';
 import { useSelector } from 'react-redux';
-import { userDataSelector } from '../../services/slices/UserSlice/UserSlice';
 import { useDispatch } from '../../services/store/store';
-import { TOrderType, type TNewOrder } from '../../utils/types';
+import { type TNewOrder } from '../../utils/types';
 import Preloader from '../../components/preloader/preloader';
-import { submitOrder } from '../../services/slices/OrderSlice/OrderSlice';
+import { orderSelector, submitOrder } from '../../services/slices/OrderSlice/OrderSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface OrderUserDataFormProps {
   onSuccess?: () => void;
@@ -20,14 +19,11 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
   onSuccess, 
   onError,
 }) => {
-  const userData = useSelector(userDataSelector);
+  const orderData = useSelector(orderSelector);
+  const navigate = useNavigate();
   const [isInitialized, setIsInitialized] = useState(false);
-  console.log(`const OrderForm: userData: ${JSON.stringify(userData)}`)
   const dispatch = useDispatch();
-  const submitText='Заявка отправлена';
-  const btnText='Отправить заявку';
 
-  
   const {
     register,
     handleSubmit,
@@ -36,77 +32,123 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
     setError,
   } = useForm<TUserInfoDataFormInputs>({
     defaultValues: {
-    fullName: userData?.name || '',
-    wallet: userData?.wallet || '',
-    phone: userData?.phone || '',
-  },
+      name: orderData?.name || '', // используем userData, а не orderData
+      wallet: orderData?.wallet || '',
+      phone: orderData?.phone || '',
+    },
   });
-
-
 
   const onSubmit: SubmitHandler<TUserInfoDataFormInputs> = async (data) => {
     try {
       console.log('Form data:', data);
-      if(!userData)
-      return;
-      
-      // Обновляем данные пользователя
-      const orderData : TNewOrder = {
-        name: data.fullName,
+      if (!orderData) return;
+
+      const newOrderData: TNewOrder = {
+        name: data.name,
         wallet: data.wallet,
         phone: data.phone,
-        userId: userData.id,
-        exchangeRate: 100,
-        exchangeValue: 100,
-        totalSum: 100,
-        type: TOrderType.Buy
+        userId: orderData.userId, // используем userData.id
+        exchangeRate: orderData.exchangeRate,
+        exchangeValue: orderData.exchangeValue,
+        totalSum: orderData.totalSum,
+        type: orderData.type
       };
       
-      console.log("Updated order data:", orderData);
-      if(orderData){
-        dispatch(submitOrder(orderData))
+      console.log("New order data:", newOrderData);
+      
+      // Ждём результат и проверяем успех
+      const resultAction = await dispatch(submitOrder(newOrderData));
+      
+      if (submitOrder.fulfilled.match(resultAction)) {
+        console.log('Order submitted successfully');
+        onSuccess?.();
+        navigate("/profile");
+      } else {
+        throw new Error('Failed to submit order');
       }
 
-      // reset();
-      onSuccess?.();
     } catch (error) {
-      console.error(error);
+      console.error('Submit error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Ошибка сервера';
       setError('root', { type: 'server', message: errorMessage });
       onError?.(error as Error);
     }
   };
 
-
   useEffect(() => {
-    if (userData && !isInitialized) {
+    if (orderData && !isInitialized) {
       reset({
-        fullName: userData.name || '',
-        wallet: userData.wallet || '',
-        phone: userData.phone || '',
+        name: orderData.name || '',
+        wallet: orderData.wallet || '',
+        phone: orderData.phone || '',
       });
       setIsInitialized(true);
     }
-  }, [userData, reset, isInitialized]);
+  }, [orderData, reset, isInitialized]);
 
-  if (!userData) {
-    return <Preloader/>;
+  if (!orderData || !orderData) {
+    return <Preloader />;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="form">
-      <UserInfoDataFormFields register={register} errors={errors} />
-      <OrderFormSubmitButton 
+        <div className='order-info-form'>
+          <div className="order-info-form-group">
+            <label htmlFor="name" className='text'>ФИО</label>
+            <input
+              id="name"
+              {...register('name', {
+                required: 'ФИО обязательно',
+                minLength: { value: 3, message: 'Минимум 3 символа' },
+              })}
+              className={`input_form ${errors.name ? 'error' : ''}`}
+              placeholder="Иванов Иван Иванович"
+            />
+            {errors.name && <span className="error-message">{errors.name.message}</span>}
+          </div>
+
+          <div className="order-info-form-group">
+            <label htmlFor="wallet" className='text'>Кошелек USDT (TRC20)</label>
+            <input
+              id="wallet"
+              {...register('wallet', {
+                required: 'Кошелек обязателен',
+                pattern: {
+                  value: /^T[a-zA-Z0-9]{33}$/,
+                  message: 'Неверный формат (должен начинаться с T, 34 символа)',
+                },
+              })}
+              className={`input_form ${errors.wallet ? 'error' : ''}`}
+              placeholder="Txxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            />
+            {errors.wallet && <span className="error-message">{errors.wallet.message}</span>}
+          </div>
+
+          <div className="order-info-form-group">
+            <label htmlFor="phone" className='text'>Телефон</label>
+            <input
+              id="phone"
+              {...register('phone', {
+                required: 'Телефон обязателен',
+                pattern: {
+                  value: /^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/,
+                  message: 'Введите корректный номер',
+                },
+              })}
+              className={`input_form ${errors.phone ? 'error' : ''}`}
+              placeholder="+7-999-999-99-99"
+            />
+            {errors.phone && <span className="error-message">{errors.phone.message}</span>}
+          </div>
+        </div>
+        <FormSubmitButton 
         isSubmitting={isSubmitting} 
         isSubmitSuccessful={isSubmitSuccessful}
-        submitText={submitText}
+        submitText="Заявка отправлена"
       >
-        <Text>
-          {btnText}
-        </Text>
-      </OrderFormSubmitButton>
+        <Text>Отправить заявку</Text>
+      </FormSubmitButton>
     </form>
   );
 };
-
 export default OrderUserDataForm;

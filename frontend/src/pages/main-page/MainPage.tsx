@@ -1,18 +1,16 @@
 import { useEffect} from 'react';
 import type {FC} from "react"
 import { useSelector, useDispatch } from '../../services/store/store';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './MainPage.css';
 import { Page} from '../Page/Page';
 import Button from '../../components/button/button';
 import RatePresenter from '../../components/rate-presenter/rate-presenter';
-import { supportLink } from '../../const/const';
-import { getRates, rateSelector, rateStatusSelector } from '../../services/slices/RateSlice/RateSlice';
+import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlice';
 // import { ReqStatus } from '../../utils/types';
 import Preloader from '../../components/preloader/preloader';
-import OrderCard from '../../components/ordercard/OrderCard';
-import type { TOrder } from '../../utils/types';
-import { loginUser, userDataSelector, UserRole } from '../../services/slices/UserSlice/UserSlice';
+import { TOrderType, type TOrder } from '../../utils/types';
+import { userDataSelector, UserRole } from '../../services/slices/UserSlice/UserSlice';
 
 export const MainPage: FC = () => {
   const dispatch = useDispatch();
@@ -51,40 +49,47 @@ export const MainPage: FC = () => {
   if (!rates) {
     return <Preloader/>
   }
-
+  
   return (
     <Page>
        <div className={`container`}>
         <RatePresenter 
-          header='Продажа'
+          type={TOrderType.Sell}
           rate={rates.rateIn}
-          rateStringConverterFunc={(value: number)=>`Курс продажи:\n${value} руб.\nза 1 USDT`}
-          className={loading ? "blur" : ""}
+          className={`half-width ${loading ? "blur" : ""}`}
         />
 
         <RatePresenter
-          header='Покупка'
+          type={TOrderType.Buy}
           rate={rates.rateOut}
-          rateStringConverterFunc={(value: number)=>`Курс покупки:\n${value} руб.\nза 1 USDT`}
-          className={loading ? "blur" : ""}
+          className={`half-width ${loading ? "blur" : ""}`}
         />
       </div>
 
-      <Button onClick={()=>{
-        navigate("/exchange")
-      }}>
+      <Button 
+        onClick={()=>{
+          navigate("/exchange")
+        }}
+        className='full-width'
+      >
           Обмен
       </Button>
 
-      <Button onClick={()=>{
-        navigate("/profile")
-      }}>
+      <Button
+        onClick={()=>{
+          navigate("/profile")
+        }}
+        className='full-width'
+      >
         Профиль
       </Button>
 
-      <Button onClick={()=>{
-        navigate("/about")
-      }}>
+      <Button
+        onClick={()=>{
+          navigate("/about")
+        }}
+        className='full-width'
+      >
         О нас
       </Button>
 
@@ -94,9 +99,11 @@ export const MainPage: FC = () => {
         </Link>
       </Button> */}
 
-      {userData?.roles && userData.roles.find((item)=>item === UserRole.ADMIN) && <Button onClick={()=>{
+      {userData?.roles && userData.roles.find((item)=>item === UserRole.ADMIN) && <Button 
+      onClick={()=>{
         navigate("/admin")
-      }}>
+      }}
+      className='full-width'>
         Админка
       </Button>
       }   

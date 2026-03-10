@@ -1,7 +1,7 @@
 // components/ExchangeCard/ExchangeCard.tsx
 import React from 'react';
 import './OrderCard.css';
-import { statusConfig, type TOrder } from '../../utils/types';
+import { statusConfig, TOrderType, type TOrder } from '../../utils/types';
 // import Button from '../button/button';
 
 export type OrderStatus = 0 | 1 | 2 | 3 | 4; // или используйте enum
@@ -25,6 +25,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   // Форматирование адреса кошелька (показываем первые и последние символы)
 
   const formatWallet = (wallet: string) => {
+    return wallet;
     if (wallet.length <= 12) return wallet;
     return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
   };
@@ -78,11 +79,40 @@ const OrderCard: React.FC<OrderCardProps> = ({
           </span>
         </div>
 
-        <div className="order-card__row">
-          <span className="order-card__label">Сумма:</span>
+
+        {onAccept && <div className="order-card__row">
+          <span className="order-card__label">ФИО:</span>
           <span className="order-card__amount">
-            {formatAmount(order.exchangeValue)}
+            {order.name}
           </span>
+        </div>}
+
+        {onAccept && <div className="order-card__row">
+          <span className="order-card__label">Телефон:</span>
+          <span className="order-card__amount">
+            {order.phone}
+          </span>
+        </div>}
+
+        <div className="order-card__info-row">
+          <div className="order-card__info-column">
+            <span className="order-card__label">Сумма обмена:</span>
+            <span className="order-card__amount">
+              {`${formatAmount(order.exchangeValue)} ${order.type === TOrderType.Sell? "Руб": "USDT"}`}
+            </span>
+          </div>
+          <div className="order-card__info-column">
+            <span className="order-card__label">Курс:</span>
+            <span className="order-card__amount">
+              {`${formatAmount(order.exchangeRate)} Руб.`}
+            </span>
+          </div>
+          <div className="order-card__info-column">
+            <span className="order-card__label">Сумма к получению:</span>
+            <span className="order-card__amount">
+              {`${formatAmount(order.totalSum)} ${order.type === TOrderType.Buy? "Руб": "USDT"}`}
+            </span>
+          </div>
         </div>
 
         {order.createdAt && (

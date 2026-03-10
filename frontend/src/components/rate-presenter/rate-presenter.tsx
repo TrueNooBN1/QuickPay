@@ -3,33 +3,30 @@ import type { FC } from 'react';
 import './rate-presenter.css'; // общие стили для всех страниц
 import Text from '../text/text';
 import "./rate-presenter.css";
+import { TOrderType } from '../../utils/types';
 
 export interface RatePresenterProps {
   rate: number;
-  header: string;
-  rateStringConverterFunc?: ((value: number) => string) | null;
+  type: TOrderType;
   className?: string;
 }
 
 const RatePresenter: FC<RatePresenterProps> = ({ 
   rate,
-  header,
-  rateStringConverterFunc = null,
-  className = '' 
+  type,
+  className 
 }) => {
   return (
-    <div className='rate-container'>
-      <h3 className='text'>{header}</h3>
-  
-      {typeof rateStringConverterFunc === 'function' ? (
-        <Text className={`formatted-text + ${className}`}>
-          {rateStringConverterFunc(rate)}
-        </Text>
-      ) : (
-        <Text>
-          {rate}
-        </Text>
-      )}  
+    <div className={`rate-container ${className}`}>
+      <h3 className='rate-presenter-header'>
+        {type === TOrderType.Buy ? 'Покупка': 'Продажа'}
+      </h3>
+      <div className='rate-presenter-currency'>
+        USDT
+      </div>
+      <div className='rate-presenter-rate'>
+        {`${rate} Руб.`}
+      </div>
 
     </div>
   );

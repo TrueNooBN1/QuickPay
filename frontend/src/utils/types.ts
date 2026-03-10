@@ -5,6 +5,12 @@ export type TOrder = TNewOrder & {
   createdAt: string;
 };
 
+export type TOrdersFilter = {
+  pageSize: number;
+  pageNumber: number;
+  status?: TOrderStatus;
+}
+
 export type TNewOrder = {
   userId: string;
   name: string;

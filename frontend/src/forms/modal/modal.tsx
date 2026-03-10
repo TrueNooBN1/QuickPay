@@ -1,18 +1,18 @@
-import clsx from 'clsx';
-import { ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import styles from './modal.module.scss';
-type ModalProps = {
-	children: ReactNode,
-	onClose: () => void
-	title?: string
-}
+import { type FC, memo, type ReactNode, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { ModalUI } from './modal-ui/modal-ui';
 
-const modalRoot = document.getElementById('modals');
+const modalRoot = document.getElementById('root');
 
-export default function Modal({children, onClose, title}: ModalProps) {
+export type TModalProps = {
+  title: string;
+  onClose: () => void;
+  children?: ReactNode;
+};
 
-	useEffect(() => {
+
+export const Modal: FC<TModalProps> = memo(({ title, onClose, children }) => {
+  useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       e.key === 'Escape' && onClose();
     };
@@ -23,15 +23,10 @@ export default function Modal({children, onClose, title}: ModalProps) {
     };
   }, [onClose]);
 
-	return createPortal(
-		<div className={clsx(styles.modal, styles.modal_active)} >
-			<div className={styles.modal__container}>
-				<button className={styles.modal__close} aria-label='закрыть' onClick={onClose} ></button>
-				<div className={styles.modal__content}>
-					{title && <h2 className={styles.modal__title}>{title}</h2>}
-					{children}
-				</div>
-			</div>
-		</div>, modalRoot as HTMLDivElement
-	);
-}
+  return ReactDOM.createPortal(
+    <ModalUI title={title} onClose={onClose}>
+      {children}
+    </ModalUI>,
+    modalRoot as HTMLDivElement
+  );
+});

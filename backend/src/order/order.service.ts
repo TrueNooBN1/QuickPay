@@ -92,9 +92,16 @@ export class OrderService {
     const limit = Math.max(1, ordersFilter.pageSize);  // размер страницы минимум 1
 
     const skip = (page - 1) * limit;
+    const where: {
+        userId: string;
+        status?: TOrderStatus;
+      } = { userId};
 
+    if (ordersFilter.status && ordersFilter.status.length !== 0) {
+      where.status = ordersFilter.status[0]; // используем переданный статус
+    }
     const [orders, total] = await this.orderRepository.findAndCount({
-      where: { userId },
+      where: where,
       skip: skip,
       take: limit,
       order: { createdAt: 'DESC' }
@@ -103,15 +110,16 @@ export class OrderService {
     if (!orders) {
       return {
         total: 0,
-        items: []
+        orders: []
       };
     }
 
-    const items = orders.map(order => this.getOrderMapperFn());
+    const items = orders.map(order => this.getOrderMapperFn()(order));
+
 
     return {
       total,
-      items
+      orders: items
     };
   }
 
@@ -154,8 +162,8 @@ export class OrderService {
     this.prevRateUpdateTime = new Date();
     this.prevRateIn = rateIn;
     this.prevRateOut = 1/rateOut;
-    console.log(`this.prevRateIn ${this.prevRateIn}`)
-    console.log(`this.prevRateOut ${this.prevRateOut}`)
+    // console.log(`this.prevRateIn ${this.prevRateIn}`)
+    // console.log(`this.prevRateOut ${this.prevRateOut}`)
   }
 
   async getRates(){

@@ -39,6 +39,7 @@ export class UserService {
   }
   async findByUserId(id: string): Promise<GetUserDTO | null> {
     const user =  await this.userRepository.findOne({ where: { id: id } });
+    console.log("async findByUserId(id: string): Promise<GetUserDTO | null>", JSON.stringify(user));
     return this.getUserMapperFn()(user);
   }
   

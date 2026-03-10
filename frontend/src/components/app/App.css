@@ -6,6 +6,10 @@
 }
 
 .app {
+  background-image:url("./img/background.png");
+  background-size:cover;
+  background-position:center;
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   width: 100vw;
@@ -13,8 +17,10 @@
   align-items: center;
   /* width: 100%; */
   min-height: 100vh;
-  background-color: red;
+  /* background-color: red; */
   color: #f2f2f3;
+  font-family: var(--button-font), sans-serif;
+
 }
 
 .logo {

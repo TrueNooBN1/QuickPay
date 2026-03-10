@@ -5,13 +5,13 @@ import {
 } from './../../../utils/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ReqStatus } from './../../../utils/types';
-import type { TNewOrder, TOrder } from './../../../utils/types';
+import type { TNewOrder, TOrder, TOrdersData, TOrdersFilter } from './../../../utils/types';
 
-export const getOrders = createAsyncThunk('order', async () => getOrdersApi());
+export const getOrders = createAsyncThunk('orders', async (data: TOrdersFilter) => {return getOrdersApi(data)});
 
 export const getOrderByNumber = createAsyncThunk(
   'orderByNumber',
-  async (number: number) => getOrderByNumberApi(number)
+  async (number: string) => getOrderByNumberApi(number)
 );
 
 export const submitOrder = createAsyncThunk(
@@ -24,15 +24,15 @@ export const submitOrder = createAsyncThunk(
 );
 
 interface IOrderSlice {
-  orders: TOrder[];
-  order: TOrder | null;
+  orders: TOrdersData | undefined;
+  order: TOrder | undefined;
   status: ReqStatus;
   error: string | null;
 }
 
 export const initialState: IOrderSlice = {
-  orders: [],
-  order: null,
+  orders: undefined,
+  order: undefined,
   status: ReqStatus.Idle,
   error: null
 };
@@ -42,21 +42,32 @@ export const OrderSlice = createSlice({
   initialState,
   reducers: {
     clearOrder: (state) => {
-      state.order = null;
-    }
+      state.order = undefined;
+    },
+    updateOrder: (state, action) =>{
+      state.order = {
+        ...state.order,
+        ...action.payload
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getOrders.pending, (state) => {
+        console.log("getOrders.pending")
         state.status = ReqStatus.Loading;
         state.error = null;
       })
       .addCase(getOrders.fulfilled, (state, action) => {
+        console.log("getOrders.fulfilled")
+        console.log(JSON.stringify(action.payload))
         state.status = ReqStatus.Success;
         state.error = null;
+        // const {orders, ...rest} = action.payload;
         state.orders = action.payload;
       })
       .addCase(getOrders.rejected, (state, action) => {
+        console.log("getOrders.rejected", action.error.message)
         state.status = ReqStatus.Failed;
         state.error = action.error.message || 'undefined error';
       })
@@ -97,4 +108,4 @@ export const OrderSlice = createSlice({
 
 export const { orderSelector, ordersSelector, ordersStatusSelector } =
   OrderSlice.selectors;
-export const { clearOrder } = OrderSlice.actions;
+export const { clearOrder, updateOrder } = OrderSlice.actions;

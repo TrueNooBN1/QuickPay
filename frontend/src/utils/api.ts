@@ -1,8 +1,8 @@
 import { apiUrl } from '../const/const';
 import { setCookie, getCookie } from './cookie';
-import type { TNewOrder, TOrder, TOrdersData, TRate, TUser } from './types';
+import type { TNewOrder, TOrder, TOrdersData, TOrdersFilter, TRate, TUser } from './types';
 
-const URL = apiUrl;
+const API_URL = apiUrl;
 
 const checkResponse = async <T>(res: Response): Promise<T> => {
   const data = await res.json();
@@ -24,7 +24,7 @@ type TRefreshResponse = TServerResponse<{
 }>;
 
 export const refreshToken = (): Promise<TRefreshResponse> =>
-  fetch(`${URL}/auth/token`, {
+  fetch(`${API_URL}/auth/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -77,7 +77,7 @@ type TNewOrderResponse = TServerResponse<{
 }>;
 
 export const getRateApi = ()=>
-  fetch(`${URL}/order/rates`, {
+  fetch(`${API_URL}/order/rates`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -91,20 +91,23 @@ export const getRateApi = ()=>
     });
 
 
-export const getOrdersApi = () =>
-  fetchWithRefresh<TOrdersResponse>(`${URL}/orders`, {
-    method: 'GET',
+export const getOrdersApi = (filter: TOrdersFilter) =>{
+  return fetchWithRefresh<TOrdersResponse>(`${API_URL}/order/filtered`, {
+    method: 'PATCH',
+    body: JSON.stringify(filter),
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
-    } as HeadersInit
+      authorization: `Bearer ${getCookie('accessToken')}`
+    } as HeadersInit,
   }).then((data) => {
-    if (data?.success) return data.orders;
+    console.log("getOrdersApi", data);
+    if (data?.success) return data;
     return Promise.reject(data);
   });
+}
 
 export const orderExchangeApi = (data: TNewOrder) =>
-  fetchWithRefresh<TNewOrderResponse>(`${URL}/order`, {
+  fetchWithRefresh<TNewOrderResponse>(`${API_URL}/order`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -120,8 +123,8 @@ type TOrderResponse = TServerResponse<{
   orders: TOrder[];
 }>;
 
-export const getOrderByNumberApi = (number: number) =>
-  fetch(`${URL}/orders/${number}`, {
+export const getOrderByNumberApi = (number: string) =>
+  fetch(`${API_URL}/orders/${number}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -141,7 +144,7 @@ type TAuthResponse = TServerResponse<{
 }>;
 
 export const registerUserApi = (data: TRegisterData) =>
-  fetch(`${URL}/auth/register`, {
+  fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -164,7 +167,7 @@ export type TTelegramLoginData = {
 };
 
 export const loginUserApi = (data: TLoginData) =>
-  fetch(`${URL}/auth/login`, {
+  fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -178,7 +181,7 @@ export const loginUserApi = (data: TLoginData) =>
     });
 
 export const loginTelegramUserApi = (data: TTelegramLoginData) =>
-  fetch(`${URL}/auth/tg_login`, {
+  fetch(`${API_URL}/auth/tg_login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -194,7 +197,7 @@ export const loginTelegramUserApi = (data: TTelegramLoginData) =>
     });
 
 export const forgotPasswordApi = (data: { email: string }) =>
-  fetch(`${URL}/password-reset`, {
+  fetch(`${API_URL}/password-reset`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -208,7 +211,7 @@ export const forgotPasswordApi = (data: { email: string }) =>
     });
 
 export const resetPasswordApi = (data: { password: string; token: string }) =>
-  fetch(`${URL}/password-reset/reset`, {
+  fetch(`${API_URL}/password-reset/reset`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'
@@ -224,7 +227,7 @@ export const resetPasswordApi = (data: { password: string; token: string }) =>
 type TUserResponse = TServerResponse<{ user: TUser }>;
 
 export const getUserApi = () =>
-  fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
+  fetchWithRefresh<TUserResponse>(`${API_URL}/auth/user`, {
     headers: {
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit
@@ -234,7 +237,7 @@ export const updateUserApi = (user: TUser) =>{
   const { id, roles, ...updateData } = user;
   console.log(`export const updateUserApi = (user: ${JSON.stringify(user)})`);
   
-  return fetchWithRefresh<TUserResponse>(`${URL}/users/${user.id}`, {
+  return fetchWithRefresh<TUserResponse>(`${API_URL}/users/${user.id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
@@ -245,7 +248,7 @@ export const updateUserApi = (user: TUser) =>{
 }
 
 export const logoutApi = () =>
-  fetch(`${URL}/auth/logout`, {
+  fetch(`${API_URL}/auth/logout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8'

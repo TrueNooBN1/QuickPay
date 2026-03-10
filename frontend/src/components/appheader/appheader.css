@@ -1,14 +1,14 @@
 .app-header {
   background-color: var(--main-background-color);
   /* border-bottom: 3px solid var(--main-font-color); */
-  height: 60px;
+  height: 100px;
   width: 100%;
   max-width: 768px;
   min-width: 375px;
   position: sticky;
   top: 0;
-  z-index: 1000;
-  color: var(--main-font-color)
+  color: var(--main-font-color);
+  z-index: 1;
 }
 .app-header:before {
   content : "";
@@ -20,10 +20,6 @@
   border-bottom: 3px solid var(--main-font-color);
 }
 
-/* .app-header--with-button { */
-  /* Можно добавить особые стили для хедера с кнопкой */
-/* } */
-
 .app-header__container {
   max-width: 100%;
   margin: 0 auto;
@@ -31,15 +27,15 @@
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .app-header__home-button {
   background: none;
   border: none;
   color: #ffffff;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: var(--font-size-medium);
+  font-weight: 600;
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 4px;
@@ -57,8 +53,17 @@
   transform: translateX(-2px);
 }
 
+.app-header__logo{
+  background-image:url("./img/logo1.png");
+  background-size:cover;
+  background-position:center;
+  height: 80px;
+  width: 210px;
+  z-index: 2;
+}
+
 .app-header__logo-text {
-  font-size: 30px;
+  font-size: var(--font-size-xxl);
   font-weight: 800;
   color: var(--main-font-color);
 }
@@ -66,3 +71,5 @@
 .app-header__logo-text-disabled {
   pointer-events: none;
 }
+
+

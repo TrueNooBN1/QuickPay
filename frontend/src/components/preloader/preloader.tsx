@@ -5,9 +5,9 @@ import { Oval } from 'react-loader-spinner';
 const Preloader: FC = ()=>{ 
   return <Page>
       <Oval
-        height={80}
-        width={80}
-        color="red"
+        height={160}
+        width={160}
+        color="var(--secondary-color)"
         visible={true}
         ariaLabel="oval-loading"
         secondaryColor="#ffffff"

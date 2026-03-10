@@ -21,6 +21,8 @@ export enum TOrderStatus {
 export type TOrdersFilter = {
   pageSize: number;
   pageNumber: number;
+  fromUser?:string;
+  status?: TOrderStatus[];
 }
 
 export type PatchOrderDTO = {
