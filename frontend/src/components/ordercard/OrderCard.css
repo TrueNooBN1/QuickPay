@@ -187,11 +187,14 @@
   
   /* Футер карточки */
   .order-card__footer {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--main-font-color);
-    text-align: right;
-    padding-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    /* margin-top: 12px; */
+    /* padding-top: 12px; */
+    /* border-top: 1px solid var(--main-font-color); */
+    text-align: center;
+    /* padding-bottom: 10px; */
   }
   
   .order-card__details {

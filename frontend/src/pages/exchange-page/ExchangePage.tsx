@@ -22,7 +22,7 @@ export const ExchangePage: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("background location" + JSON.stringify(location))
+  // console.log("background location" + JSON.stringify(location))
 
 
   const rates = useSelector(rateSelector);
@@ -102,7 +102,7 @@ export const ExchangePage: FC = () => {
         type: selectedType,
         totalSum: Number(totalSumValue),
       }
-      console.log(newOrder);
+      // console.log(newOrder);
       dispatch(updateOrder(newOrder));
     }
   }

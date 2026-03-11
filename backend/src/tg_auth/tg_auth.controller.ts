@@ -15,7 +15,7 @@ export class AuthController {
 
   @Post('tg_login')
   async login(@Body() loginDto: TelegramAuthDTO) {
-    console.log("login dto:    "+ JSON.stringify(loginDto));
+    // console.log("login dto:    "+ JSON.stringify(loginDto));
     return this.authService.login(loginDto);
   }
 

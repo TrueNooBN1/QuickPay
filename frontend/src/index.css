@@ -23,6 +23,7 @@
 
   /* --main-background-color: var(--main-color); */
   --main-background-color: rgba(0,65,47,0.75);
+  --header-background-color: rgba(0,65,47,0.75);
   --main-font-color: var(--secondary-color);
   --main-background-widget-color: var(--secondary-color);
   --main-font-widget-color: var(--main-color);
@@ -36,7 +37,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+  width: 100%; 
 }
 
 a {
@@ -53,6 +54,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
+  width: 99vw;
   min-height: 100vh;
 }
 

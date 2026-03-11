@@ -42,8 +42,12 @@ export const MainPage: FC = () => {
     return () => clearInterval(intervalId);
   }, [dispatch, rates]); // rates в зависимостях - интервал пересоздастся при изменении rates
 
-  console.log("const userData " + JSON.stringify(userData))
-  console.log("const rates " + JSON.stringify(rates))
+  // console.log("const userData " + JSON.stringify(userData))
+  // console.log("const rates " + JSON.stringify(rates))
+
+  useEffect(() => {
+    dispatch(getRates());
+  },[]);
 
 
   if (!rates) {

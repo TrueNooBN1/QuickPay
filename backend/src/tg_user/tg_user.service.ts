@@ -29,9 +29,9 @@ export class UserService {
 
   async findByTelegramId(id: string): Promise<GetUserDTO | null> {
     const user = await this.userRepository.findOne({ where: { telegramId: id } });
-    console.log("async findByTelegramId"+ JSON.stringify(user));
+    // console.log("async findByTelegramId"+ JSON.stringify(user));
     if(user !== null){
-    console.log("async findByTelegramId mapper"+ JSON.stringify(user));
+    // console.log("async findByTelegramId mapper"+ JSON.stringify(user));
       return this.getUserMapperFn()(user);
     }
 
@@ -39,7 +39,7 @@ export class UserService {
   }
   async findByUserId(id: string): Promise<GetUserDTO | null> {
     const user =  await this.userRepository.findOne({ where: { id: id } });
-    console.log("async findByUserId(id: string): Promise<GetUserDTO | null>", JSON.stringify(user));
+    // console.log("async findByUserId(id: string): Promise<GetUserDTO | null>", JSON.stringify(user));
     return this.getUserMapperFn()(user);
   }
   
@@ -53,7 +53,7 @@ export class UserService {
     });
 
     const newUser =  await this.userRepository.save(user);
-    console.log("createTelegramUser" + JSON.stringify(user) + JSON.stringify(newUser))
+    // console.log("createTelegramUser" + JSON.stringify(user) + JSON.stringify(newUser))
     return this.getUserMapperFn()(newUser);
 
   }
@@ -63,9 +63,9 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     Object.assign(user, updateDto);
     const updatedUser = await this.userRepository.save(user);
-    console.log(`async updateTelegramUser ${JSON.stringify(updateDto)}`);
-    console.log(`async updateTelegramUser ${JSON.stringify(updatedUser)}`);
-    console.log(`async updateTelegramUser ${JSON.stringify(this.getUserMapperFn()(updatedUser))}`);
+    // console.log(`async updateTelegramUser ${JSON.stringify(updateDto)}`);
+    // console.log(`async updateTelegramUser ${JSON.stringify(updatedUser)}`);
+    // console.log(`async updateTelegramUser ${JSON.stringify(this.getUserMapperFn()(updatedUser))}`);
     return this.getUserMapperFn()(updatedUser);  
   }
 
@@ -86,7 +86,7 @@ export class UserService {
 
   async validateUser(telegramId: string): Promise<GetUserDTO | null> {
     const user = await this.findByTelegramId(telegramId);
-    console.log("validate+" + JSON.stringify(user));
+    // console.log("validate+" + JSON.stringify(user));
     return user;
   }
 

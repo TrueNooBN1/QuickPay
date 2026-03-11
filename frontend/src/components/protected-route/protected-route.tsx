@@ -31,13 +31,13 @@ export default function ProtectedRoute({ children, onlyUnAuth }: TProtectedRoute
 	const location: Location<FromState> = useLocation() as Location<FromState>;
 
 	if (!isAuthChecked) {
-		console.log('WAIT USER CHECKOUT');
+		// console.log('WAIT USER CHECKOUT');
 		return <Preloader />;
 	}
 
 	// Редирект на целевой компонент
 	if (onlyUnAuth && userData) {
-		console.log('NAVIGATE FROM LOGIN TO INDEX/FROM');
+		// console.log('NAVIGATE FROM LOGIN TO INDEX/FROM');
 		const from = location.state?.from || { pathname: '/' };
 		const background = location.state?.from?.background || null;
 		return <Navigate replace to={from} state={{background}}/>;
@@ -45,7 +45,7 @@ export default function ProtectedRoute({ children, onlyUnAuth }: TProtectedRoute
 
 	// Редирект на страницу логина при отсутствии пользователя в сторе
 	if (!onlyUnAuth && !userData) {
-		console.log('NAVIGATE FROM PAGE TO LOGIN', location);		
+		// console.log('NAVIGATE FROM PAGE TO LOGIN', location);		
 		return <Navigate replace to={'/login'} state={{ from: {...location, background: location.state?.background}}} />;
 	}
 

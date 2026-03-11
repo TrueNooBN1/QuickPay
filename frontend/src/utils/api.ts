@@ -1,16 +1,16 @@
 import { apiUrl } from '../const/const';
 import { setCookie, getCookie } from './cookie';
-import type { TNewOrder, TOrder, TOrdersData, TOrdersFilter, TRate, TUser } from './types';
+import type { TAdminData, TNewOrder, TOrder, TOrdersData, TOrdersFilter, TOrderStatus, TRate, TUser } from './types';
 
 const API_URL = apiUrl;
 
 const checkResponse = async <T>(res: Response): Promise<T> => {
   const data = await res.json();
   if (!res.ok) {
-    console.log("error", data);
+    // console.log("error", data);
     return Promise.reject(data);
   }
-  console.log("res.ok true", data);
+  // console.log("res.ok true", data);
   return data;
 }
 
@@ -100,7 +100,22 @@ export const getOrdersApi = (filter: TOrdersFilter) =>{
       authorization: `Bearer ${getCookie('accessToken')}`
     } as HeadersInit,
   }).then((data) => {
-    console.log("getOrdersApi", data);
+    // console.log("getOrdersApi", data);
+    if (data?.success) return data;
+    return Promise.reject(data);
+  });
+}
+
+export const getAllOrdersApi = (filter: TOrdersFilter) =>{
+  return fetchWithRefresh<TOrdersResponse>(`${API_URL}/order/admin`, {
+    method: 'PATCH',
+    body: JSON.stringify(filter),
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      authorization: `Bearer ${getCookie('accessToken')}`
+    } as HeadersInit,
+  }).then((data) => {
+    // console.log("getAllOrdersApi", data);
     if (data?.success) return data;
     return Promise.reject(data);
   });
@@ -124,11 +139,22 @@ type TOrderResponse = TServerResponse<{
 }>;
 
 export const getOrderByNumberApi = (number: string) =>
-  fetch(`${API_URL}/orders/${number}`, {
+  fetch(`${API_URL}/order/${number}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${getCookie('accessToken')}`
     }
+  }).then((res) => checkResponse<TOrderResponse>(res));
+
+export const patchOrderByNumberApi = (number: string, newStatus: TOrderStatus) =>
+  fetch(`${API_URL}/order/${number}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${getCookie('accessToken')}`
+    },
+    body: JSON.stringify({status:newStatus})
   }).then((res) => checkResponse<TOrderResponse>(res));
 
 export type TRegisterData = {
@@ -151,7 +177,7 @@ export const registerUserApi = (data: TRegisterData) =>
     },
     body: JSON.stringify(data)
   })
-    .then((res) => { console.log("udsayiudsaydisuaydsai" +res);return checkResponse<TAuthResponse>(res)})
+    .then((res) => { return checkResponse<TAuthResponse>(res)})
     .then((data) => {
       if (data?.success) return data;
       return Promise.reject(data);
@@ -190,8 +216,8 @@ export const loginTelegramUserApi = (data: TTelegramLoginData) =>
   })
     .then((res) => checkResponse<TAuthResponse>(res))
     .then((data) => {
-      console.log("data succes" + data.success); 
-      console.log("data" + JSON.stringify(data)); 
+      // console.log("data succes" + data.success); 
+      // console.log("data" + JSON.stringify(data)); 
       if (data?.success) return data;
       return Promise.reject(data);
     });
@@ -235,7 +261,7 @@ export const getUserApi = () =>
 
 export const updateUserApi = (user: TUser) =>{
   const { id, roles, ...updateData } = user;
-  console.log(`export const updateUserApi = (user: ${JSON.stringify(user)})`);
+  // console.log(`export const updateUserApi = (user: ${JSON.stringify(user)})`);
   
   return fetchWithRefresh<TUserResponse>(`${API_URL}/users/${user.id}`, {
     method: 'PATCH',
@@ -257,3 +283,37 @@ export const logoutApi = () =>
       token: localStorage.getItem('refreshToken')
     })
   }).then((res) => checkResponse<TServerResponse<{}>>(res));
+
+type TAdminDataResponse = TServerResponse<{
+  data: TAdminData;
+}>;
+
+export const patchAdminDataApi = (data: TAdminData) =>{
+  return fetchWithRefresh<TAdminDataResponse>(`${API_URL}/order/admin-data`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      authorization: `Bearer ${getCookie('accessToken')}`
+    } as HeadersInit,
+    body: JSON.stringify(data)
+  }).then((data) => {
+    // console.log("updateAdminDataApi", data);
+    if (data?.success) return data;
+    return Promise.reject(data);
+  });;
+}
+
+export const getAdminDataApi = () =>{
+  return fetchWithRefresh<TAdminDataResponse>(`${API_URL}/order/admin-data`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+      authorization: `Bearer ${getCookie('accessToken')}`
+    } as HeadersInit,
+  }).then((data) => {
+    // console.log("getAdminDataApi", data);
+    if (data?.success) return data;
+    // console.log("getAdminDataApi reject Promise");
+    return Promise.reject(data);
+  });;
+}

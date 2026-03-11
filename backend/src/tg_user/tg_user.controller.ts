@@ -43,9 +43,9 @@ export class UserController {
     @User() user
   ) {
     const currentUserId = user.userId;
-    console.log(` async updateUser updateUserDto:${JSON.stringify(updateUserDto)}`);
-    console.log(` async updateUser id:${id}`);
-    console.log(` async updateUser user:${JSON.stringify(user)}`);
+    // console.log(` async updateUser updateUserDto:${JSON.stringify(updateUserDto)}`);
+    // console.log(` async updateUser id:${id}`);
+    // console.log(` async updateUser user:${JSON.stringify(user)}`);
 
     if (currentUserId !== id && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('You can only update your own profile');

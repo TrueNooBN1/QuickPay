@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Inject } from '@nestjs/common';
+import { AdminDataService } from 'src/admin-data/admin-data.service';
 import { OrderService } from 'src/order/order.service';
 import * as WebSocket from 'ws';
 
@@ -9,8 +10,8 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
   private readonly maxReconnectAttempts = 5;
   private readonly reconnectDelay = 5000; // 5 секунд
 
-  constructor(@Inject(OrderService)
-      private orderRepository: OrderService){}
+  constructor(@Inject(AdminDataService)
+      private adminDataService: AdminDataService){}
 
   onModuleInit() {
     this.connect();
@@ -50,7 +51,6 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
   private handleMessage(data: WebSocket.Data) {
     try {
       const rawData = JSON.parse(data.toString());
-      // console.log('📥 Received data:', rawData);
 
       const messageKey = Object.keys(rawData)[0];
       const messageData = rawData[messageKey];
@@ -75,26 +75,9 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
 
     newPairs.forEach(pair => {
       if (exchangers[pair]) {
-        // console.log(`📊 ${pair}:`, {
-        //   asksCount: exchangers[pair].ask?.length || 0,
-        //   bidsCount: exchangers[pair].bid?.length || 0,
-        //   price: exchangers[pair].price
-        // });
-
-        // Здесь можно сохранять данные в базу или отправлять через EventEmitter
-        this.orderRepository.setRate(exchangers[pair].price.usdta7a5, exchangers[pair].price.a7a5usdt);//уточнить момент
+        this.adminDataService.setRate(exchangers[pair].price.usdta7a5, exchangers[pair].price.a7a5usdt);//уточнить момент
       }
     });
-  }
-
-  private saveOrderBookData(pair: string, data: any) {
-    // Сохраняем в базу данных или отправляем клиентам
-    // Например, через EventEmitter:
-    // this.eventEmitter.emit('orderbook.update', { pair, data });
-    
-    // Или сохраняем в Redis для быстрого доступа
-    // this.redisClient.set(`orderbook:${pair}`, JSON.stringify(data));
-
   }
 
   private handleReconnect() {

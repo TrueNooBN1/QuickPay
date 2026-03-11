@@ -1,46 +1,106 @@
-import { useEffect, useState, type FC } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type FC } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Page } from '../Page';
-import { type TOrdersFilter } from '../../utils/types';
 import { OrdersList} from '../../components/orderlist/OrderList';
 import { useSelector } from 'react-redux';
-import { getOrders, ordersSelector } from '../../services/slices/OrderSlice/OrderSlice';
+import { getAllOrders, ordersFilterSelector, ordersSelector, patchOrder, resetOrdersFilterAdminState, updateFilter, type TPatchOrderStatus } from '../../services/slices/OrderSlice/OrderSlice';
 import Input from '../../components/input/input';
 import TextInput from '../../components/input/text-input';
 import Text from '../../components/text/text';
 import { useDispatch } from '../../services/store/store';
 import Button from '../../components/button/button';
+import SecondaryButton from '../../components/button/secondary-button/secondary-button';
+import { TOrderStatus, type TAdminData } from '../../utils/types';
+import { adminDataSelector, getAdminData, patchAdminData } from '../../services/slices/RateSlice/RateSlice';
+import { OrderFilters } from '../../components/orderfilters/OrderFilters';
+
+type TCheckType = {
+  changed: boolean,
+  prevValue: string
+}
 
 export const AdminPage: FC = () => {
 //   const navigate = useNavigate();
 
+  const ref = useRef<HTMLDivElement>(null);
+
   const dispatch = useDispatch();  
   const orders = useSelector(ordersSelector);
-  const [commission, setCommissionValue] = useState<string>();
-  const [wallet, setWalletValue] = useState<string>();
-  const [page, setPageValue] = useState<number>(0);
+  const filter = useSelector(ordersFilterSelector);
+  const adminData = useSelector(adminDataSelector);
+
+  const [commissionUpdated, setCommissionUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
+  const [walletUpdated, setWalletUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
 
   const onAccept = (id: string) => {
-    console.log(`accept ${id}`);
+    // console.log(`accept ${id}`);
+    const patchOrderData: TPatchOrderStatus = {
+      id: id,
+      status: TOrderStatus.ready
+    } 
+    dispatch(patchOrder(patchOrderData));
   }
-  const onDecline = (id: string) => {
-    console.log(`decline ${id}`);
+
+  const onDecline = async (id: string) => {
+    // console.log(`decline ${id}`);
+    const patchOrderData: TPatchOrderStatus = {
+      id: id,
+      status: TOrderStatus.denied
+    } 
+    dispatch(patchOrder(patchOrderData));
   }
+
   const handleCommissionChange = (newValue: string) => {
-    setCommissionValue(newValue);
+    // dispatch(patchAdminData({ comission: parseFloat(newValue) }));
+    setCommissionUpdated({prevValue: newValue, changed: adminData?.comission !== Number(newValue)})
   };
   const handleWalletChange = (newValue: string) => {
-    setWalletValue(newValue);
+    // setWalletValue(newValue);
+    setWalletUpdated({prevValue: newValue, changed: adminData?.comission !== Number(newValue)})
   };
 
-  const filter: TOrdersFilter = {
-    pageNumber: 0,
-    pageSize: 10,
+  const updateWalletAdminData = ()=>{
+    const adminData : TAdminData = {
+      buyWallet: walletUpdated.prevValue
+    }
+    dispatch(patchAdminData(adminData))
   }
 
-  useEffect(()=>{
-    dispatch(getOrders(filter));
-  }, [dispatch]);
+  const updateComissionAdminData = ()=>{
+    const adminData : TAdminData = {
+      comission: Number(commissionUpdated.prevValue)
+    }
+    // console.log("const updateComissionAdminData", commissionUpdated)
+    dispatch(patchAdminData(adminData))
+  }
+
+  useLayoutEffect(() => {
+    dispatch(resetOrdersFilterAdminState());
+    dispatch(getAdminData())
+  }, []);
+
+  useEffect(() => {
+    // console.log('adminData changed', adminData)
+    if(adminData?.comission){
+      // handleCommissionChange(adminData?.comission.toString())
+      setCommissionUpdated({changed: false, prevValue: adminData?.comission.toString()})
+    }
+    if(adminData?.buyWallet){
+      // handleWalletChange(adminData?.buyWallet)
+      setWalletUpdated({changed: false, prevValue: adminData?.buyWallet})
+    }
+  },[adminData]);
+
+  useEffect(() => {
+    dispatch(getAllOrders(filter));
+    if (ref.current) {
+      ref.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
+  }, [filter]);
 
   return (
   <Page>
@@ -50,12 +110,12 @@ export const AdminPage: FC = () => {
     <Input
      onValueChange={handleCommissionChange}
      unit={"%"}
-     value={commission}
+     value={commissionUpdated.prevValue}
      className='full-width'
      placeholder='Установите комиссию'/>
-    <Button onClick={()=>{}}>
+    {commissionUpdated.changed && <Button onClick={()=>{updateComissionAdminData()}}>
       Сохранить
-    </Button>
+    </Button>}
 
 
     <Text>
@@ -64,28 +124,51 @@ export const AdminPage: FC = () => {
     <TextInput
      onValueChange={handleWalletChange}
      unit={""}
-     value={wallet}
+     value={walletUpdated.prevValue}
      className='full-width'
      placeholder='Установите кошелек'/>
-     <Button onClick={()=>{}}>
-      Сохранить
-     </Button>
+     {walletUpdated.changed &&
+        <Button onClick={()=>{updateWalletAdminData()}}>
+          Сохранить
+        </Button>
+      }
+     
 
     <Text>
       Установить фильтр для заявок
     </Text>
-     <Button onClick={()=>{}}>
+     {/* <Button onClick={()=>{
+      dispatch(getAllOrders(filter));
+     }}>
       Применить
-     </Button>
+     </Button> */}
+     <OrderFilters onApply={() => {
+        // Дополнительные действия после применения фильтров
+        // console.log('Filters applied');
+      }} />
+
+    <div ref={ref}></div>
+    <Text>
+      Заявки
+    </Text>
     
 
     
     {orders && <OrdersList orderByDate={orders} onAccept={onAccept} onDecline={onDecline}>
     </OrdersList>}
-    { (orders && (page+1) * filter.pageSize < orders?.total) && 
-        <Button onClick={()=>setPageValue(page + 1)}>
-          Load More
-        </Button>
-    }
+    <div className='navigation-container'>
+      { (orders && (filter.pageNumber-1) * filter.pageSize > filter.pageSize-1) && 
+        <SecondaryButton onClick={()=>dispatch(updateFilter({pageNumber: filter.pageNumber-1}))}>
+          Назад
+        </SecondaryButton>
+      }
+      { (orders && (filter.pageNumber) * filter.pageSize < orders?.total) && 
+        <SecondaryButton onClick={()=>{dispatch(updateFilter({pageNumber: filter.pageNumber+1}));
+        }}>
+          Вперед
+        </SecondaryButton>
+      }
+    </div>
+
   </Page>
 )};

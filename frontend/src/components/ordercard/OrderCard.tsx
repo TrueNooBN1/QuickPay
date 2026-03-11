@@ -2,6 +2,7 @@
 import React from 'react';
 import './OrderCard.css';
 import { statusConfig, TOrderType, type TOrder } from '../../utils/types';
+import SecondaryButton from '../button/secondary-button/secondary-button';
 // import Button from '../button/button';
 
 export type OrderStatus = 0 | 1 | 2 | 3 | 4; // или используйте enum
@@ -30,6 +31,9 @@ const OrderCard: React.FC<OrderCardProps> = ({
     return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
   };
 
+  // console.log("OOOOOOOOOORDER", order.id);
+  // console.log("OOOOOOOOOORDER", order.name);
+
   // Форматирование суммы
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -43,7 +47,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   const typeLabel = order.type.toLowerCase() === 'buy' ? 'Покупка' : 'Продажа';
 
   // Получаем конфигурацию статуса
-  const statusInfo = statusConfig[order.status] || statusConfig["created"];
+  const statusInfo = statusConfig[order.status] || statusConfig["CREATED"];
 
   // Форматирование даты
   const formatDate = (dateString?: string) => {
@@ -125,17 +129,20 @@ const OrderCard: React.FC<OrderCardProps> = ({
         )}
       </div>
       
-      {onAccept && (
-        <div className="order-card__footer" onClick={()=>onAccept(order._id)}>
-          <span className="order-card__details">Подтвердить выполнение</span>
-        </div>
-      )}
-      
-      {onDecline && (
-        <div className="order-card__footer" onClick={()=>onDecline(order._id)}>
-          <span className="order-card__details">Отменить</span>
-        </div>
-      )}
+
+      <div className="order-card__footer">
+        {onAccept && (
+          <SecondaryButton  onClick={()=>onAccept(order.id)}>
+            <span className="order-card__details">Подтвердить выполнение</span>
+          </SecondaryButton>
+        )}
+        
+        {onDecline && (
+          <SecondaryButton onClick={()=>onDecline(order.id)}>
+            <span className="order-card__details">Отменить</span>
+          </SecondaryButton>
+        )}
+      </div>
 
     </div>
   );

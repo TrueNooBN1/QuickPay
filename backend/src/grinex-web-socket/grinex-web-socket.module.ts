@@ -1,10 +1,10 @@
 import { Module, Global } from '@nestjs/common';
 import { GrinexWebSocketService } from './grinex-web-socket.service';
-import { OrderModule } from 'src/order/order.module';
+import { AdminDataModule } from 'src/admin-data/admin-data.module';
 
 @Global() // если нужно использовать сервис везде
 @Module({
-  imports: [OrderModule],
+  imports: [AdminDataModule],
   providers: [GrinexWebSocketService],
   exports: [GrinexWebSocketService],
 })

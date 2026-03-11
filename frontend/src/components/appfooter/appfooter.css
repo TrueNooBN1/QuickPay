@@ -1,6 +1,10 @@
 .app-footer{
-  height: 100px;
+  display: flex;
+  min-height: 100px;
+  flex-shrink: 0;
   background-color: var(--main-background-color);
   z-index: 1;
+  min-width: 375px;
   width: 100%;
+  max-width: 768px;
 }

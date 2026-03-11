@@ -42,9 +42,9 @@ export type UserRole = typeof UserRole[keyof typeof UserRole];
 export const loginUser = createAsyncThunk(
   'loginUser',
   async (data: TTelegramLoginData, { rejectWithValue }) => {
-    console.log("loginUser");
+    // console.log("loginUser");
     const reply = await loginTelegramUserApi(data);
-    console.log("reply " + reply);
+    // console.log("reply " + reply);
     return reply.success ? reply : rejectWithValue(reply);
   }
 );
@@ -196,8 +196,8 @@ export const UserSlice = createSlice({
         state.loginUserRequestStatus = ReqStatus.Loading;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        console.log("updateUser.fulfilled");
-        console.log("updateUser.fulfilled user" + JSON.stringify(action.payload.user));
+        // console.log("updateUser.fulfilled");
+        // console.log("updateUser.fulfilled user" + JSON.stringify(action.payload.user));
         state.loginUserRequestStatus = ReqStatus.Success;
         state.data = action.payload.user;
         state.loginUserError = null;

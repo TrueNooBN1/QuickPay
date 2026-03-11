@@ -12,7 +12,7 @@ export type OrdersListProps = {
 export const OrdersList: FC<OrdersListProps> = ({ orderByDate, onDecline = undefined, onAccept = undefined }) => (
   <div className='list-container'>
     {orderByDate.orders.map((order) => (
-      <OrderCard order={order} key={order._id} onDecline={onDecline} onAccept={onAccept}/>
+      <OrderCard order={order} key={order.id} onDecline={onDecline} onAccept={onAccept}/>
     ))}
   </div>
 );

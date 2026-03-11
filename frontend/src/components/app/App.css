@@ -12,7 +12,7 @@
   background-attachment: fixed;
   display: flex;
   flex-direction: column;
-  width: 100vw;
+  width: 99vw;
   /* justify-content: center; */
   align-items: center;
   /* width: 100%; */
@@ -20,7 +20,6 @@
   /* background-color: red; */
   color: #f2f2f3;
   font-family: var(--button-font), sans-serif;
-
 }
 
 .logo {

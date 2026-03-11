@@ -21,12 +21,16 @@ export enum TOrderStatus {
 export type TOrdersFilter = {
   pageSize: number;
   pageNumber: number;
-  fromUser?:string;
   status?: TOrderStatus[];
+  name?: string,
+  createDateFrom?: Date,
+  createDateTo?: Date,
+  id?: string,
+  phone?: string
 }
 
 export type PatchOrderDTO = {
-  id: string;
+  // id: string;
   status: TOrderStatus;
 }
 

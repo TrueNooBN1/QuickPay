@@ -1,6 +1,6 @@
 
 export type TOrder = TNewOrder & {
-  _id: string;
+  id: string;
   status: TOrderStatus,
   createdAt: string;
 };
@@ -8,7 +8,12 @@ export type TOrder = TNewOrder & {
 export type TOrdersFilter = {
   pageSize: number;
   pageNumber: number;
-  status?: TOrderStatus;
+  status?: TOrderStatus[];
+  name?: string,
+  createDateFrom?: Date,
+  createDateTo?: Date,
+  id?: string,
+  phone?: string
 }
 
 export type TNewOrder = {
@@ -24,9 +29,9 @@ export type TNewOrder = {
 
 // Маппинг статусов для отображения
 export const statusConfig: Record<TOrderStatus, { label: string; className: string }> = {
-  created: { label: 'Создан', className: 'status-created' },
-  ready: { label: 'Выполнен', className: 'status-completed' },
-  denied: { label: 'Отменен', className: 'status-cancelled' },
+  CREATED: { label: 'Создан', className: 'status-created' },
+  READY: { label: 'Выполнен', className: 'status-completed' },
+  DENIED: { label: 'Отменен', className: 'status-cancelled' },
 };
 
 export type TOrdersData = {
@@ -75,8 +80,14 @@ export type TOrderType = typeof TOrderType[keyof typeof TOrderType];
 
 // export type TOrderStatus = "created" | "ready" | "denied"; // или используйте enum
 export const TOrderStatus = {
-  created: 'created',
-  ready: 'ready',
-  denied: 'denied',
+  created: 'CREATED',
+  ready: 'READY',
+  denied: 'DENIED',
 } as const;
 export type TOrderStatus = typeof TOrderStatus[keyof typeof TOrderStatus];
+
+
+export type TAdminData = {
+  comission?: number,
+  buyWallet?: string;
+}

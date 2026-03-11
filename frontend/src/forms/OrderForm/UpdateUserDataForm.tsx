@@ -40,12 +40,12 @@ const UpdateUserDataForm: React.FC<UpdateUserDataFormProps> = ({
   },
   });
 
-  console.log('User data:', userData);
+  // console.log('User data:', userData);
 
 
   const onSubmit: SubmitHandler<TUserInfoDataFormInputs> = async (data) => {
     try {
-      console.log('Form data:', data);
+      // console.log('Form data:', data);
       if(!userData)
         return;
       
@@ -58,7 +58,7 @@ const UpdateUserDataForm: React.FC<UpdateUserDataFormProps> = ({
         roles: userData.roles
       };
       
-      console.log("Updated user data:", updatedUserData);
+      // console.log("Updated user data:", updatedUserData);
       if(userData && JSON.stringify(updatedUserData) !== JSON.stringify(userData)){
         dispatch(updateUser(updatedUserData))
       }

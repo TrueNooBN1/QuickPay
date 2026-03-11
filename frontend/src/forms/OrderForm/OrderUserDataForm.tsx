@@ -5,7 +5,7 @@ import "./UserDataForm.css"
 import Text from '../../components/text/text';
 import { useSelector } from 'react-redux';
 import { useDispatch } from '../../services/store/store';
-import { type TNewOrder } from '../../utils/types';
+import { TOrderType, type TNewOrder } from '../../utils/types';
 import Preloader from '../../components/preloader/preloader';
 import { orderSelector, submitOrder } from '../../services/slices/OrderSlice/OrderSlice';
 import { useNavigate } from 'react-router-dom';
@@ -40,12 +40,12 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
 
   const onSubmit: SubmitHandler<TUserInfoDataFormInputs> = async (data) => {
     try {
-      console.log('Form data:', data);
+      // console.log('Form data:', data);
       if (!orderData) return;
 
       const newOrderData: TNewOrder = {
         name: data.name,
-        wallet: data.wallet,
+        wallet: orderData.type === TOrderType.Sell ? data.wallet : "placeholder",
         phone: data.phone,
         userId: orderData.userId, // используем userData.id
         exchangeRate: orderData.exchangeRate,
@@ -54,13 +54,13 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
         type: orderData.type
       };
       
-      console.log("New order data:", newOrderData);
+      // console.log("New order data:", newOrderData);
       
       // Ждём результат и проверяем успех
       const resultAction = await dispatch(submitOrder(newOrderData));
       
       if (submitOrder.fulfilled.match(resultAction)) {
-        console.log('Order submitted successfully');
+        // console.log('Order submitted successfully');
         onSuccess?.();
         navigate("/profile");
       } else {
@@ -107,7 +107,7 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
             {errors.name && <span className="error-message">{errors.name.message}</span>}
           </div>
 
-          <div className="order-info-form-group">
+          {orderData.type === TOrderType.Sell && <div className="order-info-form-group">
             <label htmlFor="wallet" className='text'>Кошелек USDT (TRC20)</label>
             <input
               id="wallet"
@@ -122,7 +122,7 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
               placeholder="Txxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
             />
             {errors.wallet && <span className="error-message">{errors.wallet.message}</span>}
-          </div>
+          </div>}
 
           <div className="order-info-form-group">
             <label htmlFor="phone" className='text'>Телефон</label>

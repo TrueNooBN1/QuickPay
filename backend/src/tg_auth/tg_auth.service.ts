@@ -26,13 +26,13 @@ export class AuthService {
 
   async login(authDto: TelegramAuthDTO) {
     const user = await this.userService.validateUser(authDto.telegramId);
-    console.log("validate userId " + JSON.stringify(user));
+    // console.log("validate userId " + JSON.stringify(user));
     if (!user){
-    console.log("async login(authDto: TelegramAuthDTO) + await this.register(authDto)")
+    // console.log("async login(authDto: TelegramAuthDTO) + await this.register(authDto)")
       return await this.register(authDto)
       //throw new UnauthorizedException('Invalid credentials');
     }
-    console.log("async login(authDto: TelegramAuthDTO) + this.generateTokens(user)")
+    // console.log("async login(authDto: TelegramAuthDTO) + this.generateTokens(user)")
     return this.generateTokens(user);
   }
 
@@ -75,7 +75,7 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '7d',
     });
     // Сохраняем refreshToken хеш в БД
-    console.log(JSON.stringify(user) + "user");
+    // console.log(JSON.stringify(user) + "user");
 
     this.userService.setRefreshToken(user.id, refreshToken);
     return { accessToken, refreshToken, user};

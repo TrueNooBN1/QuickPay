@@ -6,11 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PatchOrderDTO, PostOrderDTO, TOrdersFilter, TOrderStatus } from './dto/order.dto';
+import { PatchOrderDTO, PostOrderDTO, TOrdersFilter, TOrderStatus, TOrderType } from './dto/order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entitys/order.entity';
-import { DataSource, Repository } from 'typeorm';
-import { randomUUID } from 'crypto';
+import { Between, DataSource, FindOperator, FindOptionsWhere, ILike, In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { AdminDataEntity } from 'src/admin-data/entitys/admin-data.entity';
+import { AdminDataDTO } from 'src/admin-data/dto/admin-data.dto';
+import { AdminDataService } from 'src/admin-data/admin-data.service';
 
 @Injectable()
 export class OrderService {
@@ -18,12 +20,16 @@ export class OrderService {
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     private dataSource: DataSource,
-  ) {}
+    private readonly adminDataService: AdminDataService
+  ) {
+  }
 
 
   private prevRateIn: number | null = null;
   private prevRateOut: number | null = null;
   private prevRateUpdateTime: Date | null = null;
+  private cachedBuyWallet: string| null = null;
+  private cachedComission: number| null = null;
 
 
 
@@ -46,7 +52,7 @@ export class OrderService {
   }
 
   async postOrder(order: PostOrderDTO) {
-    console.log(`OrderService::postOrder(order: ${JSON.stringify(order)})`);
+    // console.log(`OrderService::postOrder(order: ${JSON.stringify(order)})`);
     const queryRunner = this.dataSource.createQueryRunner();
     //checkSession availability
     queryRunner.connect();
@@ -70,36 +76,60 @@ export class OrderService {
       phone: order.phone,
       userId: order.userId,
       type: order.type,
-      wallet: order.wallet,
+      wallet: order.type === TOrderType.BUY ? (await this.adminDataService.getAdminData()).buyWallet : order.wallet,
       status: TOrderStatus.CREATED,
       createdAt: new Date(),
     });
 
     queryRunner.commitTransaction();
-    console.log(`OrderService::postOrder after commit (order: ${JSON.stringify(newOrder)})`);
+    // console.log(`OrderService::postOrder after commit (order: ${JSON.stringify(newOrder)})`);
 
     const mapper = this.getOrderMapperFn();
     return mapper(newOrder);
 
   }
 
-  async getOrders(userId: string, ordersFilter: TOrdersFilter) {
-    console.log(`OrderService::getOrders(
-        userId: ${userId}},
-        orderFilter: ${JSON.stringify(ordersFilter)})`);
+  async getOrders(userId: string | null, ordersFilter: TOrdersFilter) {
+    // console.log(`OrderService::getOrders(
+    //     userId: ${userId}},
+    //     orderFilter: ${JSON.stringify(ordersFilter)})`);
     // Защита от отрицательных или нулевых значений
     const page = Math.max(1, ordersFilter.pageNumber); // страница не может быть меньше 1
     const limit = Math.max(1, ordersFilter.pageSize);  // размер страницы минимум 1
 
     const skip = (page - 1) * limit;
-    const where: {
-        userId: string;
-        status?: TOrderStatus;
-      } = { userId};
+    const where: FindOptionsWhere<OrderEntity> = {};
 
-    if (ordersFilter.status && ordersFilter.status.length !== 0) {
-      where.status = ordersFilter.status[0]; // используем переданный статус
+    if (userId !== null) {
+      where.userId = userId;
     }
+
+    // console.log(ordersFilter.status);
+    if (Array.isArray(ordersFilter.status)){
+      if(ordersFilter.status.length > 1){
+        where.status = In(ordersFilter.status);
+      }else{  
+        where.status = ordersFilter.status[0];
+      }
+    }
+    
+    if(ordersFilter.name){
+      where.name = ILike(`%${ordersFilter.name}%`);
+    }
+
+    if (ordersFilter.createDateFrom && ordersFilter.createDateTo) {
+      where.createdAt = Between(ordersFilter.createDateFrom, ordersFilter.createDateTo);
+    } else if (ordersFilter.createDateFrom) {
+      where.createdAt = MoreThanOrEqual(ordersFilter.createDateFrom);
+    } else if (ordersFilter.createDateTo) {
+      where.createdAt = LessThanOrEqual(ordersFilter.createDateTo);
+    }
+
+    if(ordersFilter.phone){
+      where.phone = Like(`%${ordersFilter.phone}%`);
+    }
+    // console.log("where", where);
+  
     const [orders, total] = await this.orderRepository.findAndCount({
       where: where,
       skip: skip,
@@ -116,7 +146,6 @@ export class OrderService {
 
     const items = orders.map(order => this.getOrderMapperFn()(order));
 
-
     return {
       total,
       orders: items
@@ -124,8 +153,8 @@ export class OrderService {
   }
 
   async getOrder(id: string) {
-    console.log(`OrderService::getOrder(
-        id: ${id})`);
+    // console.log(`OrderService::getOrder(
+    //     id: ${id})`);
 
     const order = await this.orderRepository.findOne({
       where: { id },
@@ -142,9 +171,9 @@ export class OrderService {
   }
 
   async patchOrderStatus(id: string, status: TOrderStatus): Promise<PostOrderDTO | null> {
-    console.log(`OrderService::patchOrderStatus(id: ${id}, status: ${status}})`);
+    // console.log(`OrderService::patchOrderStatus(id: ${id}, status: ${status}})`);
 
-    const order = await this.orderRepository.findOne({ where: { id } });
+    const order = await this.orderRepository.findOne({ where: { id: id } });
     
     if (!order) {
       return null;
@@ -156,24 +185,5 @@ export class OrderService {
 
     const mapper = this.getOrderMapperFn();
     return mapper(updatedOrder);
-
   }
-  setRate(rateIn:number, rateOut:number){
-    this.prevRateUpdateTime = new Date();
-    this.prevRateIn = rateIn;
-    this.prevRateOut = 1/rateOut;
-    // console.log(`this.prevRateIn ${this.prevRateIn}`)
-    // console.log(`this.prevRateOut ${this.prevRateOut}`)
-  }
-
-  async getRates(){
-
-    return {
-      rates:{
-        rateIn: Math.floor(this.prevRateIn * 1.02*100)/100,
-        rateOut: Math.ceil(this.prevRateOut * 0.98*100)/100
-      }
-    }
-  }
-  
 }
