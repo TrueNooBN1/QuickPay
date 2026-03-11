@@ -8,6 +8,7 @@ export const appConfig = registerAs('APP_CONFIG', () => ({
     origin: process.env.CORS_ORIGIN || '*',
     credentials: true,
   },
+  botToken: process.env.BOT_TOKEN || "",
 }));
 
 export type IConfig = ConfigType<typeof appConfig>;

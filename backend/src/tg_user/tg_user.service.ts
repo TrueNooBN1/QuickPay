@@ -1,16 +1,49 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entitys/user.entity';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt-ts';
 import { GetUserDTO } from './dto/get-user.dto';
+import * as crypto from "crypto";
+import { appConfig, IConfig } from 'src/config/app.config';
+
+export function verifyTelegramInitData(
+  initData: string,
+  botToken: string,
+): boolean {
+
+  const params = new URLSearchParams(initData);
+
+  const hash = params.get("hash");
+  params.delete("hash");
+
+  const dataCheckString = [...params.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("\n");
+
+  const secret = crypto
+    .createHash("sha256")
+    .update(botToken)
+    .digest("hex");
+
+  const hmac = crypto
+    .createHmac("sha256", secret)
+    .update(dataCheckString)
+    .digest("hex");
+
+  return hmac === hash;
+}
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @Inject(appConfig.KEY)
+    private readonly config: IConfig,
+
   ) {}
 
     private getUserMapperFn(): (User) => GetUserDTO {
@@ -84,7 +117,16 @@ export class UserService {
     return isMatch ? this.getUserMapperFn()(user) : null;
   }
 
-  async validateUser(telegramId: string): Promise<GetUserDTO | null> {
+  async validateUser(telegramId: string, initData: string): Promise<GetUserDTO | null> {
+    if(telegramId === 'undefined')
+      throw new UnauthorizedException();
+
+    const token = this.config.botToken;
+    if(!verifyTelegramInitData(initData, token)){
+      throw new UnauthorizedException();
+    }
+    
+
     const user = await this.findByTelegramId(telegramId);
     // console.log("validate+" + JSON.stringify(user));
     return user;

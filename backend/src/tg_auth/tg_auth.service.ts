@@ -25,7 +25,7 @@ export class AuthService {
 
 
   async login(authDto: TelegramAuthDTO) {
-    const user = await this.userService.validateUser(authDto.telegramId);
+    const user = await this.userService.validateUser(authDto.telegramId, authDto.initData);
     // console.log("validate userId " + JSON.stringify(user));
     if (!user){
     // console.log("async login(authDto: TelegramAuthDTO) + await this.register(authDto)")

@@ -20,6 +20,7 @@ import OrderUserDataForm from '../../forms/OrderForm/OrderUserDataForm';
 import UpdateUserDataForm from '../../forms/OrderForm/UpdateUserDataForm';
 import "./../../assets/fonts/Montserrat-SemiBold.woff";
 import AppFooter from '../appfooter/appfooter';
+import WebApp from "@twa-dev/sdk"
 
 function App() {
 
@@ -34,13 +35,18 @@ function App() {
   };
   const dispatch = useDispatch();
 
-  const authData :TTelegramLoginData = {telegramId: "213123321"} ;
+  const user = WebApp.initDataUnsafe.user;
+  const initData = WebApp.initData;
+  const authData :TTelegramLoginData = {
+    telegramId: user?.id ? String(user?.id) : "",
+    initData: initData,
+  } ;
 
   useEffect(() => {
     dispatch(loginUser(authData));
     dispatch(getRates());
+    WebApp.ready();
   }, [dispatch]);
-
 
   return (
     <div className="app">

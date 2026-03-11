@@ -11,6 +11,7 @@ import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlic
 import Preloader from '../../components/preloader/preloader';
 import { TOrderType, type TOrder } from '../../utils/types';
 import { userDataSelector, UserRole } from '../../services/slices/UserSlice/UserSlice';
+import WebApp from '@twa-dev/sdk';
 
 export const MainPage: FC = () => {
   const dispatch = useDispatch();
@@ -48,9 +49,13 @@ export const MainPage: FC = () => {
   useEffect(() => {
     dispatch(getRates());
   },[]);
+  
+  const user = WebApp.initDataUnsafe.user;
+  
+  if(!user?.id)
+    return <Preloader />
 
-
-  if (!rates) {
+  if (!rates || rates.rateIn === 0 || rates.rateOut === 0) {
     return <Preloader/>
   }
   

@@ -190,6 +190,7 @@ export type TLoginData = {
 
 export type TTelegramLoginData = {
   telegramId: string;
+  initData: string;
 };
 
 export const loginUserApi = (data: TLoginData) =>

@@ -1,5 +1,4 @@
-import { IsArray, isArray } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Unique } from 'typeorm';
 import { UserRole } from '../dto/get-user.dto';
 
 @Entity('users')
@@ -7,7 +6,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   telegramId: string;
 
   // @Column({ unique: true })
@@ -25,7 +24,7 @@ export class UserEntity {
   @Column({ nullable: true })
   phone: string;
 
-  @Column({ default: false })
+  @Column({ default: true })
   isActive: boolean;
 
   @CreateDateColumn()
