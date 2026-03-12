@@ -1,6 +1,6 @@
 import { useEffect, useState, type FC } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import './AppHeader.css';
+import './appheader.css';
 
 export interface AppHeaderProps {
   className?: string;

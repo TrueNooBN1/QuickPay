@@ -121,12 +121,11 @@ export class UserService {
     if(telegramId === 'undefined')
       throw new UnauthorizedException();
 
-    const token = this.config.botToken;
-    if(!verifyTelegramInitData(initData, token)){
-      throw new UnauthorizedException();
-    }
+    // const token = this.config.botToken;
+    // if(!verifyTelegramInitData(initData, token)){
+    //   throw new UnauthorizedException();
+    // }
     
-
     const user = await this.findByTelegramId(telegramId);
     // console.log("validate+" + JSON.stringify(user));
     return user;

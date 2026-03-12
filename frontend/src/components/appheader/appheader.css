@@ -59,7 +59,7 @@
 }
 
 .app-header__logo{
-  background-image:url("./img/logo1.png");
+  background-image:url("/img/logo1.png");
   background-size:cover;
   background-position:center;
   height: 80px;

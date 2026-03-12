@@ -108,7 +108,11 @@ export const initialState: IUserSlice = {
 export const UserSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    setUser: (state, action) => {
+      state.data = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // .addCase(registerUser.pending, (state) => {
@@ -234,3 +238,4 @@ export const {
   userDataSelector,
   userRequestStatusSelector
 } = UserSlice.selectors;
+export const { setUser } = UserSlice.actions;

@@ -1,8 +1,6 @@
 // components/Button/Button.tsx
 import type { FC } from 'react';
 import './rate-presenter.css'; // общие стили для всех страниц
-import Text from '../text/text';
-import "./rate-presenter.css";
 import { TOrderType } from '../../utils/types';
 
 export interface RatePresenterProps {

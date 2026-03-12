@@ -1,0 +1,96 @@
+version: "3.9"
+services:
+
+  backend:
+    # build: 
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    # image: "backend-docker:latest" # образ будет называться backend-docker с тегом latest
+    image: ghcr.io/truenoobn1/film-react-nest-backend:latest
+    restart: unless-stopped 
+    #restart: on-failure #prod
+
+    env_file:
+     - backend/.env
+    networks:
+      - internal-network
+    ports:
+      - "3000:3000" 
+    depends_on:
+      - postgres
+    healthcheck:
+      test: "wget -nv -t1 --spider 'http://localhost:3000/'"
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    # image: "frontend-docker:latest"
+    image: ghcr.io/truenoobn1/film-react-nest-frontend:latest
+    # в окружение контейнера попадут переменные из файла .env 
+    env_file:
+     - ./frontend/.env
+    volumes:
+    # Монтируем volume в директорию сборки
+     - frontend-dist:/app/frontend/dist/
+
+  nginx:
+    image: "nginx:alpine"
+    ports:
+    - 80:80
+    - 443:443
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped 
+    #restart: on-failure #prod
+    volumes:
+      - frontend-dist:/usr/share/nginx/html:ro
+    networks:
+      - internal-network
+      - internet
+
+  postgres:
+    image: "postgres:16"
+    # в окружение контейнера попадут переменные из файла .env 
+    environment:
+      POSTGRES_PASSWORD: secretpassword 
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+    # монтируем директорию ./pg-data основной ОС в директорию с данными в контейнере
+     - ./pg-data:/var/lib/postgresql/data/pgdata
+    networks:
+     - internal-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_docker
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: lob3uk68@admin.ru
+      PGADMIN_DEFAULT_PASSWORD: mySuperStrongPassword
+    networks:
+      - internal-network
+      - internet
+    depends_on:
+      - postgres
+    volumes:
+    - pgadmin-data:/var/lib/pgadmin
+
+networks:
+  internal-network:
+    driver: bridge
+    internal: true
+  internet:
+    driver: bridge 
+
+volumes:
+  pgdata:
+  frontend-dist:
+  pgadmin-data:

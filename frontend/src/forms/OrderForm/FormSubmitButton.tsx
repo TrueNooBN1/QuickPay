@@ -1,6 +1,5 @@
 import React from 'react';
 import "../../components/button/button.css"
-import Button from '../../components/button/button';
 
 export type TUserInfoDataFormInputs = {
   name: string,

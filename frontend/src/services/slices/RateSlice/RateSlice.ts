@@ -3,7 +3,7 @@ import {
   getRateApi,
   patchAdminDataApi
 } from './../../../utils/api';
-import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ReqStatus } from './../../../utils/types';
 import type { TAdminData, TRate } from './../../../utils/types';
 

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import FormSubmitButton, { type TUserInfoDataFormInputs } from './FormSubmitButton';
 import "./UserDataForm.css"
 import { useSelector } from 'react-redux';
-import { getUserData, updateUser, userDataSelector } from '../../services/slices/UserSlice/UserSlice';
+import { updateUser, userDataSelector } from '../../services/slices/UserSlice/UserSlice';
 import { useDispatch } from '../../services/store/store';
 import Preloader from '../../components/preloader/preloader';
 import { useNavigate } from 'react-router-dom';

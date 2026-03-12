@@ -2,7 +2,6 @@ import { type FC, memo, type ReactNode } from 'react';
 
 import '../modal.css';
 import { ModalOverlayUI } from "../modal-overlay-ui/modal-overlay-ui";
-import Button from '../../../components/button/button';
 import SecondaryButton from '../../../components/button/secondary-button/secondary-button';
 
 // import { CloseIcon } from '@zlden/react-developer-burger-ui-components';

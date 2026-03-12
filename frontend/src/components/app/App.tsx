@@ -1,26 +1,22 @@
 import { useEffect } from 'react'
-import './App.css'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch } from '../../services/store/store'
-// import styles from './App.css';
-// import * as styles from './App.css';
 import './App.css';
 import { MainPage } from '../../pages/main-page';
 import { NotFound404 } from '../../pages/not-found-404';
 import { AboutPage } from '../../pages/about-page';
 import AppHeader from '../appheader/appheader';
 import { ExchangePage } from '../../pages/exchange-page/ExchangePage';
-import { loginUser } from '../../services/slices/UserSlice/UserSlice';
 import { Modal } from '../../forms/modal/modal';
 import { ProfilePage } from '../../pages/profile-page/ProfilePage';
 import { AdminPage } from '../../pages/admin-page/AdminPage';
-import { getRates } from '../../services/slices/RateSlice/RateSlice';
-import type { TTelegramLoginData } from '../../utils/api';
+import { getRates, rateSelector } from '../../services/slices/RateSlice/RateSlice';
 import OrderUserDataForm from '../../forms/OrderForm/OrderUserDataForm';
 import UpdateUserDataForm from '../../forms/OrderForm/UpdateUserDataForm';
 import "./../../assets/fonts/Montserrat-SemiBold.woff";
 import AppFooter from '../appfooter/appfooter';
-import WebApp from "@twa-dev/sdk"
+import { useSelector } from 'react-redux';
+import Preloader from '../preloader/preloader';
 
 function App() {
 
@@ -35,18 +31,43 @@ function App() {
   };
   const dispatch = useDispatch();
 
-  const user = WebApp.initDataUnsafe.user;
-  const initData = WebApp.initData;
-  const authData :TTelegramLoginData = {
-    telegramId: user?.id ? String(user?.id) : "",
-    initData: initData,
-  } ;
+  const rates = useSelector(rateSelector);
+  // const user = useSelector(userDataSelector);
+  const loading = !rates?.rateIn || !rates?.rateOut;
+
+  // useEffect(() => {
+  //   dispatch(loginUser());
+  // }, [user]);
+
 
   useEffect(() => {
-    dispatch(loginUser(authData));
-    dispatch(getRates());
-    WebApp.ready();
-  }, [dispatch]);
+    // Если данные уже есть - ничего не делаем
+    // if (rates?.rateIn && rates.rateOut) return;
+
+    // Функция для запроса
+    const fetchDataIfNeeded = () => {
+      dispatch(getRates());
+    };
+
+    // // Сразу выполняем первый запрос
+    // fetchDataIfNeeded();
+
+    // // Устанавливаем интервал
+    const intervalId = setInterval(fetchDataIfNeeded, 5000);
+
+    // Очищаем интервал при размонтировании или когда данные появятся
+    return () => clearInterval(intervalId);
+  }, [dispatch, rates]); // rates в зависимостях - интервал пересоздастся при изменении rates
+
+  if(loading){
+    return (
+    <div className="app">
+      <AppHeader />
+      <Preloader />
+      <AppFooter />
+    </div>
+    )
+  }
 
   return (
     <div className="app">

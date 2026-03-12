@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import './AppFooter.css';
+import './appfooter.css';
 
 export interface AppHeaderProps {
   className?: string;
@@ -7,7 +7,7 @@ export interface AppHeaderProps {
 
 const AppFooter: FC<AppHeaderProps> = ({ className = '' }) => {
   return (
-    <footer className='app-footer'>
+    <footer className={`app-footer ${className}`}>
     </footer>
   );
 
