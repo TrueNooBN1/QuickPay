@@ -53,11 +53,13 @@ function App() {
     // fetchDataIfNeeded();
 
     // // Устанавливаем интервал
-    const intervalId = setInterval(fetchDataIfNeeded, 5000);
-
+    console.log(rates?.rateIn === 0 || rates?.rateOut === 0, rates?.rateIn,  rates?.rateOut)
+    const intervalId = setInterval(fetchDataIfNeeded, !rates || rates?.rateIn === 0 || rates?.rateOut === 0 ? 1000: 10000)
     // Очищаем интервал при размонтировании или когда данные появятся
     return () => clearInterval(intervalId);
   }, [dispatch, rates]); // rates в зависимостях - интервал пересоздастся при изменении rates
+
+  
 
   if(loading){
     return (

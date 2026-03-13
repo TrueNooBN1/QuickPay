@@ -71,7 +71,7 @@ export class OrderService {
     const newOrder = await this.orderRepository.save({
       totalSum: order.totalSum,
       exchangeValue: order.exchangeValue,
-      exchangeRate: order.type === TOrderType.BUY ? this.adminDataService.getRates().rates.rateIn : this.adminDataService.getRates().rates.rateOut,
+      exchangeRate: order.type === TOrderType.BUY ? this.adminDataService.getRates().rates.rateOut : this.adminDataService.getRates().rates.rateIn,
       name: order.name,
       phone: order.phone,
       userId: order.userId,

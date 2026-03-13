@@ -29,7 +29,7 @@ export const ExchangePage: FC = () => {
   const userData = useSelector(userDataSelector);
   // const orderRequest = useSelector(ordersStatusSelector);  
   
-  const [selectedType, setSelectedType] = useState<TOrderType>(TOrderType.Sell);
+  const [selectedType, setSelectedType] = useState<TOrderType>(TOrderType.Buy);
 
   const [exchangeValue, setExchangeValue] = useState('');
   const [totalSumValue, setTotalSumValue] = useState('');
@@ -144,12 +144,17 @@ export const ExchangePage: FC = () => {
       <Input onValueChange={handleTotalSumValueChange} unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} value={totalSumValue} className='full-width'/>
 
       <Button 
-        className={exchangeValue.length === 0 ? "disabled" : ""} 
+        className={`${exchangeValue.length === 0 ? "disabled" : ""} full-width`} 
         onClick={onClick}
       >
         Оформить заявку
       </Button>
-      
+      <div className='return-block'>
+        <Button onClick={()=>{navigate("/")}} className='full-width'>
+          На главную
+        </Button>
+      </div>
+
     </Page>
   );
 };

@@ -44,7 +44,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
   // Определяем класс для типа операции
   const typeClass = order.type.toLowerCase() === 'buy' ? 'type-buy' : 'type-sell';
-  const typeLabel = order.type.toLowerCase() === 'buy' ? 'Покупка' : 'Продажа';
+  const typeLabel = order.type.toLowerCase() === 'buy' ? 'Продажа' : 'Покупка';
 
   // Получаем конфигурацию статуса
   const statusInfo = statusConfig[order.status] || statusConfig["CREATED"];

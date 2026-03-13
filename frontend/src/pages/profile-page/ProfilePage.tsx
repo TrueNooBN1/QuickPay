@@ -46,6 +46,10 @@ export const ProfilePage: FC = () => {
         className='full-width'>
         Обновить личную информацию
       </Button>
+      <Button onClick={()=>{navigate("/")}} className='full-width'>
+        На главную
+      </Button>
+
       <div ref={ref}></div>
       <Text>
         Заявки
