@@ -36,7 +36,7 @@ export function TelegramProvider({ children }: any) {
       // };
 
       const auth = await loginTelegramUserApi(authData);
-      console.log(authData);
+      // console.log(authData);
       
       if(!authData.initData)
         return;

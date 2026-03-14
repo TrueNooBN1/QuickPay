@@ -132,13 +132,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
       <div className="order-card__footer">
         {onAccept && (
-          <SecondaryButton  onClick={()=>onAccept(order.id)}>
+          <SecondaryButton  onClick={()=>onAccept(order.id)} className='order-card__button'>
             <span className="order-card__details">Подтвердить выполнение</span>
           </SecondaryButton>
         )}
         
         {onDecline && (
-          <SecondaryButton onClick={()=>onDecline(order.id)}>
+          <SecondaryButton onClick={()=>onDecline(order.id)} className='order-card__button'>
             <span className="order-card__details">Отменить</span>
           </SecondaryButton>
         )}

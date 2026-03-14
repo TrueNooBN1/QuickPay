@@ -181,10 +181,10 @@ export const OrderFilters: React.FC<OrderFiltersProps> = ({ onApply }) => {
 
       {/* Кнопки действий */}
       <div className="filter-actions">
-        <SecondaryButton onClick={handleApply}>
+        <SecondaryButton onClick={handleApply}  className = "order-filter__button">
           Применить фильтры
         </SecondaryButton>
-        <SecondaryButton onClick={handleReset}>
+        <SecondaryButton onClick={handleReset} className = "order-filter__button">
           Сбросить
         </SecondaryButton>
       </div>

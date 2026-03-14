@@ -1,0 +1,10 @@
+.poster{
+    background-image: url('/img/preview.png');
+    background-size: cover; 
+}
+@media (max-width: 480px) {
+  .poster {
+    background-image: url('/img/previewVertical.png');
+    background-size: cover; 
+  }
+}

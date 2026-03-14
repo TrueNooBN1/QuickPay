@@ -151,6 +151,10 @@
   background-color: #545b62;
 }
 
+.order-filter__button {
+  width: 50%;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .order-filters {

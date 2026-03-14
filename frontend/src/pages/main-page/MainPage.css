@@ -1,9 +1,9 @@
 .link{
   max-width: 100%; 
-  color: #ffffff;
+  color: var(--main-font-color);
 }
 .link:visited {
-  color: #ffffff;
+  color: var(--main-font-color);
 }
 
 .container{

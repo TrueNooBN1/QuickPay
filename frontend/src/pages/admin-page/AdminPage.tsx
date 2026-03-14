@@ -163,8 +163,7 @@ export const AdminPage: FC = () => {
         </SecondaryButton>
       }
       { (orders && (filter.pageNumber) * filter.pageSize < orders?.total) && 
-        <SecondaryButton onClick={()=>{dispatch(updateFilter({pageNumber: filter.pageNumber+1}));
-        }}>
+        <SecondaryButton onClick={()=>{dispatch(updateFilter({pageNumber: filter.pageNumber+1}))}}>
           Вперед
         </SecondaryButton>
       }
