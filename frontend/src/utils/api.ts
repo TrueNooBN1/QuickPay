@@ -321,3 +321,75 @@ export const getAdminDataApi = () =>{
     return Promise.reject(data);
   });;
 }
+
+export const downloadOrdersXLSX = async (filters: TOrdersFilter) => {
+  try {
+    const token = getCookie('accessToken');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 секунд таймаут
+    console.log("fetch");
+    const res = await fetch(`${API_URL}/xlsxexport`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(filters),
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    console.log("after fetch");
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
+    }
+
+    // Проверяем тип ответа
+    const contentType = res.headers.get('content-type');
+    
+    if (contentType?.includes('json')) {
+      // Если пришел JSON (ошибка или метаданные)
+      const json = await res.json();
+      console.error('Server returned JSON instead of file:', json);
+      throw new Error('Server returned unexpected response');
+    }
+
+    // Получаем blob
+    const blob = await res.blob();
+    console.log(blob);
+    
+    // Проверяем, что это действительно Excel файл
+    if (blob.size === 0) {
+      throw new Error('Received empty file');
+    }
+
+    // Получаем имя файла из заголовков или используем дефолтное
+    const disposition = res.headers.get('content-disposition');
+    let filename = `ordersP${filters.createDateFrom}${filters.createDateTo}.xlsx`;
+    
+    if (disposition && disposition.includes('filename=')) {
+      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (match && match[1]) {
+        filename = match[1].replace(/['"]/g, '');
+      }
+    }
+
+    // Создаем и скачиваем файл
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true, filename };
+    
+  } catch (error) {
+    console.error('Error downloading XLSX:', error);
+    throw error;
+  }
+};

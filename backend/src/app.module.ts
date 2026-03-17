@@ -12,6 +12,7 @@ import { TelegramAuthModule } from './tg_auth/tg_auth.module';
 import { TelegramUserModule } from './tg_user/tg_user.module';
 import { OrderModule } from './order/order.module';
 import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.module';
+import { XLSXExportModule } from './xlsxexport/xlsxexport.module';
 
 @Module({
   imports: [
@@ -48,8 +49,7 @@ import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.mod
     TelegramUserModule,
     TelegramAuthModule,
     OrderModule,
+    XLSXExportModule
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule { }

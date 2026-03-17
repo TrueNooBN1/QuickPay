@@ -10,9 +10,10 @@ import Text from '../../components/text/text';
 import { useDispatch } from '../../services/store/store';
 import Button from '../../components/button/button';
 import SecondaryButton from '../../components/button/secondary-button/secondary-button';
-import { TOrderStatus, type TAdminData } from '../../utils/types';
+import { TOrderStatus, type TAdminData} from '../../utils/types';
 import { adminDataSelector, getAdminData, patchAdminData } from '../../services/slices/RateSlice/RateSlice';
 import { OrderFilters } from '../../components/orderfilters/OrderFilters';
+import { downloadOrdersXLSX } from '../../utils/api';
 
 type TCheckType = {
   changed: boolean,
@@ -75,6 +76,7 @@ export const AdminPage: FC = () => {
     // console.log("const updateComissionAdminData", commissionUpdated)
     dispatch(patchAdminData(adminData))
   }
+
 
   useLayoutEffect(() => {
     dispatch(resetOrdersFilterAdminState());
@@ -148,6 +150,12 @@ export const AdminPage: FC = () => {
         // Дополнительные действия после применения фильтров
         // console.log('Filters applied');
       }} />
+
+    <Button className='full-width' onClick={async ()=>{
+      return await downloadOrdersXLSX(filter)
+    }}>
+      Скачать XLSX по фильтру
+    </Button>
 
     <div ref={ref}></div>
     <Text>

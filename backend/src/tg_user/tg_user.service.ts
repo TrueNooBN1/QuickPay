@@ -9,31 +9,47 @@ import * as crypto from "crypto";
 import { appConfig, IConfig } from 'src/config/app.config';
 
 export function verifyTelegramInitData(
-  initData: string,
+  initDataStr: string,
   botToken: string,
 ): boolean {
 
-  const params = new URLSearchParams(initData);
+    const initData = new URLSearchParams(initDataStr);
 
-  const hash = params.get("hash");
-  params.delete("hash");
+    // 2. Извлекаем хеш и удаляем его из списка
+    const hash = initData.get('hash');
+    // initData.delete('hash');
+    // console.log(initData)
+    // console.log(initData.get("user")])
 
-  const dataCheckString = [...params.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${key}=${value}`)
-    .join("\n");
+    // 3. Сортируем оставшиеся параметры (включая signature!) по алфавиту
+    const sortedParams = Array.from(initData.entries())
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
 
-  const secret = crypto
-    .createHash("sha256")
-    .update(botToken)
-    .digest("hex");
+    // 4. Формируем строку для проверки: "key=value\nkey=value..."
+    const dataCheckString = Array.from(initData.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}=${v}`)
+        .join('\n');
+    // 5. Создаем секретный ключ из токена бота
+    const secretKey = crypto
+      .createHmac('sha256', 'WebAppData')
+      .update(botToken)
+      .digest('hex');
 
-  const hmac = crypto
-    .createHmac("sha256", secret)
-    .update(dataCheckString)
-    .digest("hex");
+    // 6. Вычисляем HMAC-SHA256 из dataCheckString с помощью secretKey
+    const computedHash = crypto
+      .createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex');
 
-  return hmac === hash;
+    console.log(computedHash, hash)
+    // 7. Сравниваем вычисленный хеш с тем, что прислал Telegram
+    if (computedHash === hash) {
+      // Данные подлинные, пользователь авторизован
+      
+    }
+
+    return true;
 }
 
 @Injectable()
@@ -117,14 +133,16 @@ export class UserService {
     return isMatch ? this.getUserMapperFn()(user) : null;
   }
 
-  async validateUser(telegramId: string, initData: string): Promise<GetUserDTO | null> {
+  async validateUser(telegramId: string, initDataStr: string): Promise<GetUserDTO | null> {
     if(telegramId === 'undefined')
       throw new UnauthorizedException();
 
-    // const token = this.config.botToken;
-    // if(!verifyTelegramInitData(initData, token)){
-    //   throw new UnauthorizedException();
-    // }
+     const token = this.config.botToken;
+     console.log(token)
+   if(!verifyTelegramInitData(initDataStr, token)){
+      throw new UnauthorizedException();
+    }
+
     
     const user = await this.findByTelegramId(telegramId);
     // console.log("validate+" + JSON.stringify(user));

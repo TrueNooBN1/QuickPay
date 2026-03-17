@@ -12,11 +12,24 @@ export enum TOrderType {
   BUY = 'BUY',
 }
 
+export const typeConfig: Record<TOrderType, string> = {
+  SELL: 'Продажа',
+  BUY: 'Покупка',
+};
+
+
 export enum TOrderStatus {
   CREATED = 'CREATED',
   READY = 'READY',
   DENIED = 'DENIED',
 }
+
+export const statusConfig: Record<TOrderStatus, string> = {
+  CREATED: 'Создан',
+  READY: 'Выполнен',
+  DENIED: 'Отменен',
+};
+
 
 export type TOrdersFilter = {
   pageSize: number;
@@ -94,4 +107,7 @@ export class GetOrderDTO {
 
   @IsDate()
   createdAt: Date;
+
+  @IsNumber()
+  executeRate: number;
 }

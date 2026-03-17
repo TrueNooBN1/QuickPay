@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PatchOrderDTO, PostOrderDTO, TOrdersFilter, TOrderStatus, TOrderType } from './dto/order.dto';
+import { GetOrderDTO, PatchOrderDTO, PostOrderDTO, TOrdersFilter, TOrderStatus, TOrderType } from './dto/order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entitys/order.entity';
 import { Between, DataSource, FindOperator, FindOptionsWhere, ILike, In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
@@ -33,7 +33,7 @@ export class OrderService {
 
 
 
-  private getOrderMapperFn(): (Order) => PostOrderDTO {
+  private getOrderMapperFn(): (Order) => GetOrderDTO {
     return (root) => {
       return {
         id: root.id,
@@ -47,6 +47,7 @@ export class OrderService {
         exchangeValue: root.exchangeValue,
         type: root.type,
         createdAt: root.createdAt,
+        executeRate: root.executeRate,
       };
     };
   }
