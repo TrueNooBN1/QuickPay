@@ -45,7 +45,7 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
 
       const newOrderData: TNewOrder = {
         name: data.name,
-        wallet: orderData.type === TOrderType.Sell ? data.wallet : "placeholder",
+        wallet: orderData.type === TOrderType.Buy ? data.wallet : "placeholder",
         phone: data.phone,
         userId: orderData.userId, // используем userData.id
         exchangeRate: orderData.exchangeRate,
@@ -107,7 +107,7 @@ const OrderUserDataForm: React.FC<OrderUserDataFormProps> = ({
             {errors.name && <span className="error-message">{errors.name.message}</span>}
           </div>
 
-          {orderData.type === TOrderType.Sell && <div className="order-info-form-group">
+          {orderData.type === TOrderType.Buy && <div className="order-info-form-group">
             <label htmlFor="wallet" className='text'>Кошелек USDT (TRC20)</label>
             <input
               id="wallet"

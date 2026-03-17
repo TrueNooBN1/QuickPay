@@ -44,10 +44,10 @@ export const ExchangePage: FC = () => {
     if(rates){
       setTotalSumValue(newValue);
         if(selectedType === TOrderType.Sell){
-          const updatedExchangeValue = Number(newValue) * rates?.rateIn;
+          const updatedExchangeValue = Number(newValue) * rates?.rateOut;
           setExchangeValue(updatedExchangeValue.toFixed(2));
         }else if(selectedType === TOrderType.Buy){
-          const updatedExchangeValue = Number(newValue) / rates?.rateOut;
+          const updatedExchangeValue = Number(newValue) / rates?.rateIn;
           setExchangeValue(updatedExchangeValue.toFixed(2));
         }
     }
@@ -62,10 +62,10 @@ export const ExchangePage: FC = () => {
     if(rates){
       setExchangeValue(newValue);
         if(selectedType === TOrderType.Sell){
-          const updatedExchangeValue = Number(newValue) / rates?.rateIn;
+          const updatedExchangeValue = Number(newValue) / rates?.rateOut;
           setTotalSumValue(updatedExchangeValue.toFixed(2));
         }else if(selectedType === TOrderType.Buy){
-          const updatedExchangeValue = Number(newValue) * rates?.rateOut;
+          const updatedExchangeValue = Number(newValue) * rates?.rateIn;
           setTotalSumValue(updatedExchangeValue.toFixed(2));
         }
     }
@@ -81,6 +81,10 @@ export const ExchangePage: FC = () => {
     dispatch(getRates());
   }, [dispatch]);
 
+  useEffect(() => {
+    handleTotalSumValueChange(totalSumValue);
+  }, [rates]);
+
 
   if (!rates) {
     return <Preloader/>
@@ -91,10 +95,10 @@ export const ExchangePage: FC = () => {
       navigate("/exchange/create", {
         state: { background: location } // передаём объект, а не строку
       });
-
+      
       const newOrder:TNewOrder={
         userId: userData?.id,
-        exchangeRate: selectedType === TOrderType.Buy ? rates.rateOut : rates.rateIn,
+        exchangeRate: selectedType === TOrderType.Buy ? rates.rateIn : rates.rateOut,
         exchangeValue: Number(exchangeValue),
         phone: userData.phone? userData.phone : "",
         name: userData.name? userData.name : "",
@@ -114,20 +118,20 @@ export const ExchangePage: FC = () => {
       <div className='tabs full-width'>
         <TabButton 
           onClick={()=>{
-            updateType(TOrderType.Sell);
-          }}
-          className={`half-width ${(selectedType === TOrderType.Sell) ? "active" : ""}`}
-          >
-            Продажа
-        </TabButton>      
-
-        <TabButton 
-          onClick={()=>{
             updateType(TOrderType.Buy);
           }}
           className={`half-width ${(selectedType === TOrderType.Buy) ? "active" : ""}`}
         >
             Покупка
+        </TabButton>      
+
+        <TabButton 
+          onClick={()=>{
+            updateType(TOrderType.Sell);
+          }}
+          className={`half-width ${(selectedType === TOrderType.Sell) ? "active" : ""}`}
+          >
+            Продажа
         </TabButton>      
       </div>
 
@@ -135,13 +139,20 @@ export const ExchangePage: FC = () => {
         className={'full-width'}
         type={selectedType}
         rate={selectedType === TOrderType.Buy?
-                  rates.rateOut:
-                  rates.rateIn
+                  rates.rateIn:
+                  rates.rateOut
              }/>
 
-      <Input onValueChange={handleExchangeValueChange} unit={selectedType === TOrderType.Sell ? "Руб." : "USDT"} value={exchangeValue} className='full-width'/>
+      <Input
+       onValueChange={handleTotalSumValueChange}
+       unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} 
+       value={totalSumValue} className='full-width'/>
+      <Input 
+        onValueChange={handleExchangeValueChange}
+        unit={selectedType === TOrderType.Sell ? "Руб." : "USDT"}
+        value={exchangeValue} className='full-width'
+        placeholder='Введите сумму к получению'/>
 
-      <Input onValueChange={handleTotalSumValueChange} unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} value={totalSumValue} className='full-width'/>
 
       <Button 
         className={`${exchangeValue.length === 0 ? "disabled" : ""} full-width`} 

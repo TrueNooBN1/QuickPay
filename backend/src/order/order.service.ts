@@ -71,12 +71,12 @@ export class OrderService {
     const newOrder = await this.orderRepository.save({
       totalSum: order.totalSum,
       exchangeValue: order.exchangeValue,
-      exchangeRate: order.type === TOrderType.BUY ? this.adminDataService.getRates().rates.rateOut : this.adminDataService.getRates().rates.rateIn,
+      exchangeRate: order.type === TOrderType.SELL ? this.adminDataService.getRates().rates.rateOut : this.adminDataService.getRates().rates.rateIn,
       name: order.name,
       phone: order.phone,
       userId: order.userId,
       type: order.type,
-      wallet: order.type === TOrderType.BUY ? (await this.adminDataService.getAdminData()).buyWallet : order.wallet,
+      wallet: order.type === TOrderType.SELL ? (await this.adminDataService.getAdminData()).buyWallet : order.wallet,
       status: TOrderStatus.CREATED,
       createdAt: new Date(),
     });

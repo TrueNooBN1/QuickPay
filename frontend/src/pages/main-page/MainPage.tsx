@@ -27,14 +27,14 @@ export const MainPage: FC = () => {
   return (
     <Page>
        <div className={`container`}>
-        <RatePresenter 
-          type={TOrderType.Sell}
+        <RatePresenter
+          type={TOrderType.Buy}
           rate={rates.rateIn}
           className={`half-width ${loading ? "blur" : ""}`}
         />
 
-        <RatePresenter
-          type={TOrderType.Buy}
+        <RatePresenter 
+          type={TOrderType.Sell}
           rate={rates.rateOut}
           className={`half-width ${loading ? "blur" : ""}`}
         />
@@ -66,12 +66,6 @@ export const MainPage: FC = () => {
       >
         О нас
       </Button>
-
-      {/* <Button>
-        <Link target='_blank' to={supportLink} className='link'>
-          Поддержка
-        </Link>
-      </Button> */}
 
       {userData?.roles && userData.roles.find((item)=>item === UserRole.ADMIN) && <Button 
       onClick={()=>{

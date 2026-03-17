@@ -53,7 +53,7 @@ function App() {
     // fetchDataIfNeeded();
 
     // // Устанавливаем интервал
-    console.log(rates?.rateIn === 0 || rates?.rateOut === 0, rates?.rateIn,  rates?.rateOut)
+    // console.log(rates?.rateIn === 0 || rates?.rateOut === 0, rates?.rateIn,  rates?.rateOut)
     const intervalId = setInterval(fetchDataIfNeeded, !rates || rates?.rateIn === 0 || rates?.rateOut === 0 ? 3000: 10000)
     // Очищаем интервал при размонтировании или когда данные появятся
     return () => clearInterval(intervalId);
