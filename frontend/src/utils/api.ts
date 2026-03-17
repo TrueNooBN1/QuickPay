@@ -147,14 +147,17 @@ export const getOrderByNumberApi = (number: string) =>
     }
   }).then((res) => checkResponse<TOrderResponse>(res));
 
-export const patchOrderByNumberApi = (number: string, newStatus: TOrderStatus) =>
+export const patchOrderByNumberApi = (number: string, newStatus: TOrderStatus, executionRate: number) =>
   fetch(`${API_URL}/order/${number}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       authorization: `Bearer ${getCookie('accessToken')}`
     },
-    body: JSON.stringify({status:newStatus})
+    body: JSON.stringify({
+      status: newStatus,
+      executionRate: executionRate
+    })
   }).then((res) => checkResponse<TOrderResponse>(res));
 
 export type TRegisterData = {

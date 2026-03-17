@@ -32,6 +32,7 @@ export type TOrdersFilter = {
 export type PatchOrderDTO = {
   // id: string;
   status: TOrderStatus;
+  executionRate: number;
 }
 
 export class PostOrderDTO {

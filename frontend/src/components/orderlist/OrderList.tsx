@@ -6,7 +6,7 @@ import "./OrderList.css"
 export type OrdersListProps = {
   orderByDate: TOrdersData;
   onDecline?:(id: string) => void;
-  onAccept?: (id: string) => void;
+  onAccept?: (id: string, executionRate: number) => void;
 };
 
 export const OrdersList: FC<OrdersListProps> = ({ orderByDate, onDecline = undefined, onAccept = undefined }) => (

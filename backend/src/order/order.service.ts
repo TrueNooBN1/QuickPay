@@ -170,7 +170,7 @@ export class OrderService {
 
   }
 
-  async patchOrderStatus(id: string, status: TOrderStatus): Promise<PostOrderDTO | null> {
+  async patchOrderStatus(id: string, status: TOrderStatus, executionRate: number): Promise<PostOrderDTO | null> {
     // console.log(`OrderService::patchOrderStatus(id: ${id}, status: ${status}})`);
 
     const order = await this.orderRepository.findOne({ where: { id: id } });
@@ -180,6 +180,7 @@ export class OrderService {
     }
 
     order.status = status;
+    order.executionRate = executionRate;
 
     const updatedOrder = await this.orderRepository.save(order);
 

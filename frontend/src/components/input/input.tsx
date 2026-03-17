@@ -24,6 +24,7 @@ const Input = ({ onValueChange, unit = "", value = "", className, placeholder}: 
         onChange={handleChange}
         placeholder={placeholder ? placeholder : `Введите сумму обмена`}
         className='input'
+        pattern="\\d*"
       />
       <span className="input-unit__label">{`${unit}`}</span>
     </div>

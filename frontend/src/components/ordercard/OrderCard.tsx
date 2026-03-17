@@ -1,16 +1,15 @@
-// components/ExchangeCard/ExchangeCard.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import './OrderCard.css';
-import { statusConfig, TOrderType, type TOrder } from '../../utils/types';
+import { statusConfig, TOrderStatus, TOrderType, type TOrder } from '../../utils/types';
 import SecondaryButton from '../button/secondary-button/secondary-button';
-// import Button from '../button/button';
+import Input from '../input/input';
 
 export type OrderStatus = 0 | 1 | 2 | 3 | 4; // или используйте enum
 
 export interface OrderCardProps {
   order: TOrder;
   /** Обработчик клика по карточке */
-  onAccept?: (id: string) => void | undefined;
+  onAccept?: (id: string, executionRate: number) => void | undefined;
   onDecline?: (id: string) => void | undefined;
   /** Дополнительный класс */
   className?: string;
@@ -48,6 +47,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
   // Получаем конфигурацию статуса
   const statusInfo = statusConfig[order.status] || statusConfig["CREATED"];
+  const [executeRate, setExecuteRate] = useState("");
 
   // Форматирование даты
   const formatDate = (dateString?: string) => {
@@ -102,7 +102,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
           <div className="order-card__info-column">
             <span className="order-card__label">Сумма обмена:</span>
             <span className="order-card__amount">
-              {`${formatAmount(order.exchangeValue)} ${order.type === TOrderType.Sell? "Руб": "USDT"}`}
+              {`${formatAmount(order.totalSum)} ${order.type === TOrderType.Buy? "Руб": "USDT"}`}
             </span>
           </div>
           <div className="order-card__info-column">
@@ -114,7 +114,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
           <div className="order-card__info-column">
             <span className="order-card__label">Сумма к получению:</span>
             <span className="order-card__amount">
-              {`${formatAmount(order.totalSum)} ${order.type === TOrderType.Buy? "Руб": "USDT"}`}
+              {`${formatAmount(order.exchangeValue)} ${order.type === TOrderType.Sell? "Руб": "USDT"}`}
             </span>
           </div>
         </div>
@@ -128,16 +128,19 @@ const OrderCard: React.FC<OrderCardProps> = ({
           </div>
         )}
       </div>
-      
+
+      {
+        (order.status ===TOrderStatus.created && onAccept) && <Input onValueChange={setExecuteRate} value={executeRate} className='full-width' placeholder='Введите курс исполнения'/>
+      }
 
       <div className="order-card__footer">
-        {onAccept && (
-          <SecondaryButton  onClick={()=>onAccept(order.id)} className='order-card__button'>
+        {(order.status ===TOrderStatus.created && onAccept &&  executeRate) && (
+          <SecondaryButton  onClick={()=>onAccept(order.id, Number(executeRate))} className='order-card__button'>
             <span className="order-card__details">Подтвердить выполнение</span>
           </SecondaryButton>
         )}
         
-        {onDecline && (
+        {(order.status ===TOrderStatus.created && onDecline) && (
           <SecondaryButton onClick={()=>onDecline(order.id)} className='order-card__button'>
             <span className="order-card__details">Отменить</span>
           </SecondaryButton>

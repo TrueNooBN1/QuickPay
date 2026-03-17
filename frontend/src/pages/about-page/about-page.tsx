@@ -34,7 +34,7 @@ export const AboutPage: FC = () => {
       markers = {mapProps.markers}
       className = {"full-width"}/>
     <Text className='full-width'>
-      Как добраться
+      Как добраться(нажми для воспроизведения)
     </Text>
     <VideoPlayer 
       src = {"/video/how-to-reach.mp4"}

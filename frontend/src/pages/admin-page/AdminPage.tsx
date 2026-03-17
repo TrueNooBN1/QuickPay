@@ -32,11 +32,12 @@ export const AdminPage: FC = () => {
   const [commissionUpdated, setCommissionUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
   const [walletUpdated, setWalletUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
 
-  const onAccept = (id: string) => {
+  const onAccept = (id: string, executionRate: number) => {
     // console.log(`accept ${id}`);
     const patchOrderData: TPatchOrderStatus = {
       id: id,
-      status: TOrderStatus.ready
+      status: TOrderStatus.ready,
+      executionRate
     } 
     dispatch(patchOrder(patchOrderData));
   }
@@ -45,7 +46,8 @@ export const AdminPage: FC = () => {
     // console.log(`decline ${id}`);
     const patchOrderData: TPatchOrderStatus = {
       id: id,
-      status: TOrderStatus.denied
+      status: TOrderStatus.denied,
+      executionRate: 0
     } 
     dispatch(patchOrder(patchOrderData));
   }

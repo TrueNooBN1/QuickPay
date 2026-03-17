@@ -21,9 +21,10 @@ export const getOrderByNumber = createAsyncThunk(
 export type TPatchOrderStatus = {
   status: TOrderStatus,
   id: string
+  executionRate: number
 }
 
-export const patchOrder = createAsyncThunk('patchOrder', async (data: TPatchOrderStatus)=>patchOrderByNumberApi(data.id, data.status));
+export const patchOrder = createAsyncThunk('patchOrder', async (data: TPatchOrderStatus)=>patchOrderByNumberApi(data.id, data.status, data.executionRate));
 
 export const submitOrder = createAsyncThunk(
   'submitOrder',

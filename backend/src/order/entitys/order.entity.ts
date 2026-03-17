@@ -36,6 +36,12 @@ export class OrderEntity {
   @Column()
   createdAt: Date;
 
+  @Column({
+    nullable: true,
+    default: null
+  })
+  executionRate: number;
+
   // @OneToMany(() => Schedule, (schedule) => schedule.filmId)
   // schedule: Schedule;
 }

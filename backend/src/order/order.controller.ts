@@ -188,10 +188,10 @@ export class OrderController {
     // );
     try {
       if (id.length === 0 || body.status.length === 0) {
-        throw new BadRequestException("Не заданы параметры фильтра");
+        throw new BadRequestException("Некорректный запрос");
       }
 
-      const orderResponse = await this.orderService.patchOrderStatus(id, body.status);
+      const orderResponse = await this.orderService.patchOrderStatus(id, body.status, body.executionRate);
 
       return {orders:[orderResponse]};
     } catch (error) {
