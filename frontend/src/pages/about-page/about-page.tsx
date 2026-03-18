@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Page } from '../Page';
 import Button from '../../components/button/button';
 import Text from '../../components/text/text';
-import { mapApiKey, supportLink, supportLinkText } from '../../const/const';
+import { mapApiKey, supportLink, supportLinkText, supportPhone } from '../../const/const';
 import { YandexMapCustom, type YandexMapCustomProps } from '../../components/map/ymap';
 import { VideoPlayer } from '../../components/videoplayer/videoplayer';
 import "./abaout-page.css"
@@ -53,6 +53,13 @@ export const AboutPage: FC = () => {
       className='link'
     >
       {supportLinkText}
+    </Link>
+
+    <Link
+     to={`tel:${supportPhone}`}
+     className='link'
+    >
+      {`Телефон поддержки: ${supportPhone}`}
     </Link>
     <Button onClick={()=>{navigate("/")}}>
       На главную

@@ -28,15 +28,15 @@ export class AdminDataService {
   setRate(rateIn:number, rateOut:number){
     this.prevRateUpdateTime = new Date();
     this.prevRateIn = rateIn === 0 ? null : rateIn;
-    this.prevRateOut =  rateOut === 0 ? null : 1/rateOut;
+    this.prevRateOut =  rateOut === 0 ? null : rateOut;
 
   }
 
   getRates(){
     return {
       rates:{
-        rateIn: Math.floor(this.prevRateIn * (1 + this.cachedComission)*100)/100,
-        rateOut: Math.ceil(this.prevRateOut * (1 - this.cachedComission)*100)/100
+        rateIn: Math.floor(this.prevRateIn * (1 + this.cachedComission)*100)/100,//BUYRATE
+        rateOut: Math.ceil(this.prevRateOut * (1 - this.cachedComission)*100)/100//SELLRATE
       }
     }
   }

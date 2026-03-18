@@ -89,7 +89,7 @@ export class XLSXExportService {
 
     const items = orders.map(order => this.getOrderXSLXMapperFn()(order));
 
-    console.log(items);
+    // console.log(items);
     return await this.generateOrderExcel1(items, ordersFilter);
   }
 
@@ -102,7 +102,7 @@ export class XLSXExportService {
 
     data.forEach(item => {
       const xlsxItem = this.getOrderXSLXMapperFn()(item);
-      console.log(xlsxItem);
+      // console.log(xlsxItem);
       worksheet.addRow(item);
     });
 
@@ -145,7 +145,7 @@ export class XLSXExportService {
     let workSheetsTotals: Map<string, {totalExchange, totalSum, totalSummary}> = new Map();
     let workSheetsColor: Map<string, {typeColor, statusColor}> = new Map();
 
-    console.log("here");
+    // console.log("here");
 
     if (Array.isArray(ordersFilter.status)){
       ordersFilter.status.forEach(status => {
@@ -168,7 +168,7 @@ export class XLSXExportService {
 
     for(let i = 0; i <  data.length; i+=1){
       const xlsxItem = this.getOrderXSLXMapperFn()(data[i]);
-      console.log(xlsxItem);
+      // console.log(xlsxItem);
       const key = this.generateWorksheetKey(xlsxItem.type, xlsxItem.status);
       const workSheetRef = workSheetsMap.get(key);
       let summary = xlsxItem.type === TOrderType.BUY ? xlsxItem.exchangeValue : xlsxItem.totalSum;

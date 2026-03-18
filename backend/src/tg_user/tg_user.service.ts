@@ -17,7 +17,8 @@ export function verifyTelegramInitData(
 
     // 2. Извлекаем хеш и удаляем его из списка
     const hash = initData.get('hash');
-    // initData.delete('hash');
+    initData.delete('hash');
+    initData.delete('hash');
     // console.log(initData)
     // console.log(initData.get("user")])
 
@@ -34,15 +35,18 @@ export function verifyTelegramInitData(
     const secretKey = crypto
       .createHmac('sha256', 'WebAppData')
       .update(botToken)
-      .digest('hex');
+      .digest();
+
+
+    const secretKeyHex = secretKey.toString('hex');
 
     // 6. Вычисляем HMAC-SHA256 из dataCheckString с помощью secretKey
     const computedHash = crypto
-      .createHmac('sha256', secretKey)
+      .createHmac('sha256', secretKeyHex)
       .update(dataCheckString)
       .digest('hex');
 
-    console.log(computedHash, hash)
+    // console.log(computedHash, hash)
     // 7. Сравниваем вычисленный хеш с тем, что прислал Telegram
     if (computedHash === hash) {
       // Данные подлинные, пользователь авторизован
@@ -138,7 +142,7 @@ export class UserService {
       throw new UnauthorizedException();
 
      const token = this.config.botToken;
-     console.log(token)
+    //  console.log(token)
    if(!verifyTelegramInitData(initDataStr, token)){
       throw new UnauthorizedException();
     }

@@ -1,13 +1,17 @@
+export let accessToken = "";
+
 export function getCookie(name: string): string | undefined {
-  const matches = document.cookie.match(
-    new RegExp(
-      '(?:^|; )' +
-        // eslint-disable-next-line no-useless-escape
-        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
-        '=([^;]*)'
-    )
-  );
-  return matches ? decodeURIComponent(matches[1]) : undefined;
+  console.log(accessToken || name, accessToken, name)
+  return accessToken || name;
+  // const matches = document.cookie.match(
+  //   new RegExp(
+  //     '(?:^|; )' +
+  //       // eslint-disable-next-line no-useless-escape
+  //       name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
+  //       '=([^;]*)'
+  //   )
+  // );
+  // return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 export function setCookie(
@@ -19,7 +23,7 @@ export function setCookie(
     path: '/',
     ...props
   };
-
+  accessToken = value;
   let exp = props.expires;
   if (exp && typeof exp === 'number') {
     const d = new Date();

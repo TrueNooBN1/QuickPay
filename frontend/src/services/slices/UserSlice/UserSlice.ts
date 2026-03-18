@@ -147,9 +147,10 @@ export const UserSlice = createSlice({
         state.isAuthChecked = true;
         state.isAuthenticated = true;
         state.data = action.payload.user;
-        setCookie('accessToken', action.payload.accessToken);
         localStorage.setItem('refreshToken', action.payload.refreshToken);
+        localStorage.setItem('accessToken', action.payload.accessToken);
         state.loginUserError = null;
+        setCookie('accessToken', action.payload.accessToken);
       })
       .addCase(loginUser.rejected, (state, action) => {
         // console.log("login isRejected");

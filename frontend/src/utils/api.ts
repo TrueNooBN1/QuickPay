@@ -1,5 +1,5 @@
 import { apiUrl } from '../const/const';
-import { setCookie, getCookie } from './cookie';
+import { getCookie, setCookie } from './cookie';
 import type { TAdminData, TNewOrder, TOrder, TOrdersData, TOrdersFilter, TOrderStatus, TRate, TUser } from './types';
 
 const API_URL = apiUrl;
@@ -39,7 +39,10 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
         return Promise.reject(refreshData);
       }
       localStorage.setItem('refreshToken', refreshData.refreshToken);
+      sessionStorage.setItem('accessToken', refreshData.accessToken);
       setCookie('accessToken', refreshData.accessToken);
+
+      // }
       return refreshData;
     });
 
