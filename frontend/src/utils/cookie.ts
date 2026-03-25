@@ -1,7 +1,7 @@
 export let accessToken = "";
 
 export function getCookie(name: string): string | undefined {
-  console.log(accessToken || name, accessToken, name)
+  // console.log(accessToken || name, accessToken, name)
   return accessToken || name;
   // const matches = document.cookie.match(
   //   new RegExp(

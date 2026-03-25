@@ -109,7 +109,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       )}
       
       <video
-        webkit-playsinline
+        webkit-playsinline={true}
         ref={videoRef}
         width={width}
         height={height}

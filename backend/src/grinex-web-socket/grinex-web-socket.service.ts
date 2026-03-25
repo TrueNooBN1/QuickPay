@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Inject } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Inject, Logger } from '@nestjs/common';
 import { AdminDataService } from 'src/admin-data/admin-data.service';
 import { OrderService } from 'src/order/order.service';
 import * as WebSocket from 'ws';
@@ -7,18 +7,24 @@ import * as WebSocket from 'ws';
 export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
   private ws: WebSocket;
   private reconnectAttempts = 0;
-  private readonly maxReconnectAttempts = 5;
+  private readonly maxReconnectAttempts = 10;
   private readonly reconnectDelay = 5000; // 5 секунд
 
-  constructor(@Inject(AdminDataService)
-      private adminDataService: AdminDataService){}
+  constructor(
+      @Inject(AdminDataService)
+      private adminDataService: AdminDataService,
+    ){}
 
   onModuleInit() {
     this.connect();
+    this.schedulePeriodicReconnect();
   }
 
   onModuleDestroy() {
     this.disconnect();
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
   }
 
   private connect() {
@@ -65,6 +71,7 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
 
   private processExchangersData(exchangers: any) {
     // Обрабатываем каждый валютный пэр
+    console.log('💼 WebSocket processExchangersData');
     const pairs = [
       'a7a5rub', 'btcrub', 'btcusdt', 'ethrub', 
       'ethusdt', 'usda7a5', 'usdta7a5', 'usdtrub'
@@ -72,6 +79,8 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
     const newPairs = [
       'usdta7a5',
     ];
+
+    console.log('💼 WebSocket processExchangersData');
 
     newPairs.forEach(pair => {
       if (exchangers[pair]) {
@@ -92,6 +101,8 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
       }, this.reconnectDelay);
     } else {
       console.error('❌ Max reconnection attempts reached');
+      this.disconnect();
+      this.connect();
     }
   }
 
@@ -106,5 +117,20 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     }
+  }
+
+  private reconnectTimer: NodeJS.Timeout | null = null;
+
+  private schedulePeriodicReconnect() {
+    const intervalMs = 60 * 60 * 1000; // 60 минут в миллисекундах
+    
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+    
+    this.reconnectTimer = setTimeout(() => {
+      console.log('⏰ Periodic reconnect triggered (60 minutes)');
+      this.connect();
+    }, intervalMs);
   }
 }

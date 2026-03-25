@@ -9,6 +9,7 @@ export const appConfig = registerAs('APP_CONFIG', () => ({
     credentials: true,
   },
   botToken: process.env.BOT_TOKEN || "",
+  notifyEmail: process.env.ORDER_NOTIFY_EMAIL || undefined,
 }));
 
 export type IConfig = ConfigType<typeof appConfig>;

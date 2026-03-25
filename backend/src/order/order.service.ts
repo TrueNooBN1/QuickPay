@@ -13,6 +13,8 @@ import { Between, DataSource, FindOperator, FindOptionsWhere, ILike, In, LessTha
 import { AdminDataEntity } from 'src/admin-data/entitys/admin-data.entity';
 import { AdminDataDTO } from 'src/admin-data/dto/admin-data.dto';
 import { AdminDataService } from 'src/admin-data/admin-data.service';
+import { EmailService } from 'src/email-module/src/email';
+import { appConfig, IConfig } from 'src/config/app.config';
 
 @Injectable()
 export class OrderService {
@@ -20,7 +22,11 @@ export class OrderService {
     @InjectRepository(OrderEntity)
     private orderRepository: Repository<OrderEntity>,
     private dataSource: DataSource,
-    private readonly adminDataService: AdminDataService
+    private readonly adminDataService: AdminDataService,
+    private readonly emailService: EmailService,
+    @Inject(appConfig.KEY)
+    private readonly config: IConfig,
+    
   ) {
   }
 
@@ -86,6 +92,16 @@ export class OrderService {
     // console.log(`OrderService::postOrder after commit (order: ${JSON.stringify(newOrder)})`);
 
     const mapper = this.getOrderMapperFn();
+
+    try{
+      if(this.config.notifyEmail){
+        // this.emailService.sendTemplateEmail(this.config.notifyEmail, "Новая заявка", "invoice", {type: newOrder.type, rate: newOrder.exchangeRate, exchangeValue: newOrder.exchangeValue, totalSum: newOrder.totalSum});
+        const emailText = `${order.type === TOrderType.SELL ? 'Продажа' : 'Покупка'} на сумму ${newOrder.exchangeValue} по курсу ${newOrder.exchangeRate}. Итого: ${newOrder.totalSum}`;
+        await this.emailService.sendPlainText(this.config.notifyEmail, "Новая заявка", emailText);
+      }
+    }catch(err){
+      console.log(err);
+    }
     return mapper(newOrder);
 
   }

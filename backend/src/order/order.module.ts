@@ -6,11 +6,13 @@ import { OrderService } from './order.service';
 import { AdminDataEntity } from 'src/admin-data/entitys/admin-data.entity';
 import { AdminDataService } from 'src/admin-data/admin-data.service';
 import { AdminDataModule } from 'src/admin-data/admin-data.module';
+import { EmailModule } from 'src/email-module/src/email';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity]),
-    AdminDataModule
+    AdminDataModule,
+    EmailModule
   ],
   controllers: [OrderController],
   providers: [OrderService],

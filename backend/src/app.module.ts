@@ -13,12 +13,14 @@ import { TelegramUserModule } from './tg_user/tg_user.module';
 import { OrderModule } from './order/order.module';
 import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.module';
 import { XLSXExportModule } from './xlsxexport/xlsxexport.module';
+import { EmailModule } from './email-module/src/email';
+import emailConfig from './email-module/src/config/email.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, jwtConfig, dbConfig],
+      load: [appConfig, jwtConfig, dbConfig, emailConfig],
     }),
 
     TypeOrmModule.forRootAsync({
@@ -49,7 +51,8 @@ import { XLSXExportModule } from './xlsxexport/xlsxexport.module';
     TelegramUserModule,
     TelegramAuthModule,
     OrderModule,
-    XLSXExportModule
+    XLSXExportModule,
+    EmailModule
   ],
 })
 export class AppModule { }
