@@ -77,15 +77,15 @@ export class GrinexWebSocketService implements OnModuleInit, OnModuleDestroy {
       'ethusdt', 'usda7a5', 'usdta7a5', 'usdtrub'
     ];
     const newPairs = [
-      'usdta7a5',
+      'usdtrub'
     ];
 
     console.log('💼 WebSocket processExchangersData');
 
     newPairs.forEach(pair => {
       if (exchangers[pair]) {
-        // console.log(exchangers[pair].ask[0].price);//BUYRATE
-        // console.log(exchangers[pair].bid[0].price);//SELLRATE
+        // console.log(pair, exchangers[pair].ask[0].price);//BUYRATE
+        // console.log(pair, exchangers[pair].bid[0].price);//SELLRATE
         this.adminDataService.setRate(exchangers[pair].ask[0].price, exchangers[pair].bid[0].price);//уточнить момент
       }
     });
