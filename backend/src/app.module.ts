@@ -14,6 +14,7 @@ import { OrderModule } from './order/order.module';
 import { WebSocketClientModule } from './grinex-web-socket/grinex-web-socket.module';
 import { XLSXExportModule } from './xlsxexport/xlsxexport.module';
 import { EmailModule } from './email-module/src/email';
+import { RapiraRateUpdaterModule } from './rapira-rate-updater/rapira-rate-updater.module';
 import emailConfig from './email-module/src/config/email.config';
 
 @Module({
@@ -46,13 +47,15 @@ import emailConfig from './email-module/src/config/email.config';
       }),
     }),
 
-    WebSocketClientModule,
+    // WebSocketClientModule,
+    RapiraRateUpdaterModule,
 
     TelegramUserModule,
     TelegramAuthModule,
     OrderModule,
     XLSXExportModule,
-    EmailModule
+    EmailModule,
+    RapiraRateUpdaterModule
   ],
 })
 export class AppModule { }

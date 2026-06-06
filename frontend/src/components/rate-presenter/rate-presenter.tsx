@@ -9,6 +9,14 @@ export interface RatePresenterProps {
   className?: string;
 }
 
+/**
+ * 
+ * @param rate Курс валюты (например, 76.56 для USDT/RUB, если rate < 0 будет выоводится шаблонная строка о невозможности провести операцию)
+ * @param type Тип операции (buy/sell) - определяет направление расчета
+ * @param className CSS класс для стилизации элемента
+ * @returns 
+ */
+
 const RatePresenter: FC<RatePresenterProps> = ({ 
   rate,
   type,
@@ -23,7 +31,7 @@ const RatePresenter: FC<RatePresenterProps> = ({
         USDT
       </div>
       <div className='rate-presenter-rate'>
-        {`${rate} Руб.`}
+        {rate > 0 ? `${rate} Руб.` : `-`}
       </div>
 
     </div>

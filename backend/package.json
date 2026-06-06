@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.3.0",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
@@ -33,6 +34,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@types/debug": "^4.1.12",
     "@types/ws": "^8.18.1",
+    "axios": "^1.17.0",
     "bcrypt-ts": "^8.0.1",
     "bull": "^4.16.5",
     "class-transformer": "^0.5.1",

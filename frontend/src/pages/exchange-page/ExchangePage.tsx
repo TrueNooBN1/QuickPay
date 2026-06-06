@@ -16,6 +16,8 @@ import { userDataSelector } from '../../services/slices/UserSlice/UserSlice';
 import { TOrderType, type TNewOrder } from '../../utils/types';
 import RatePresenter from '../../components/rate-presenter/rate-presenter';
 import TabButton from '../../components/button/tab-button/tab-button';
+import Text from '../../components/text/text';
+
 
 export const ExchangePage: FC = () => {
 
@@ -135,31 +137,43 @@ export const ExchangePage: FC = () => {
         </TabButton>      
       </div>
 
-      <RatePresenter 
-        className={'full-width'}
-        type={selectedType}
-        rate={selectedType === TOrderType.Buy?
-                  rates.rateIn:
-                  rates.rateOut
-             }/>
 
-      <Input
-       onValueChange={handleTotalSumValueChange}
-       unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} 
-       value={totalSumValue} className='full-width'/>
-      <Input 
-        onValueChange={handleExchangeValueChange}
-        unit={selectedType === TOrderType.Sell ? "Руб." : "USDT"}
-        value={exchangeValue} className='full-width'
-        placeholder='Введите сумму к получению'/>
+      {selectedType === TOrderType.Buy ? 
+        <>
+        <RatePresenter 
+          className={'full-width'}
+          type={selectedType}
+          rate={selectedType === TOrderType.Buy?
+                    rates.rateIn:
+                    rates.rateOut
+              }/>
+          <Input
+          onValueChange={handleTotalSumValueChange}
+          unit={selectedType === TOrderType.Buy ? "Руб." : "USDT"} 
+          value={totalSumValue} className='full-width'/>
+          <Input 
+            onValueChange={handleExchangeValueChange}
+            // unit={selectedType === TOrderType.Sell ? "Руб." : "USDT"}
+            unit={"USDT"}
+            value={exchangeValue} className='full-width'
+            placeholder='Введите сумму к получению'/>
 
 
-      <Button 
-        className={`${exchangeValue.length === 0 ? "disabled" : ""} full-width`} 
-        onClick={onClick}
-      >
-        Оформить заявку
-      </Button>
+          <Button 
+            className={`${exchangeValue.length === 0 ? "disabled" : ""} full-width`} 
+            onClick={onClick}
+          >
+            Оформить заявку
+          </Button>
+        </>
+      : 
+      <>
+        <Text className='full-width'>
+          Скоро будет доступно.
+          Мы работаем над восстановлением фукнционала.
+        </Text>
+      </>}
+
       <div className='return-block'>
         <Button onClick={()=>{navigate("/")}} className='full-width'>
           На главную
