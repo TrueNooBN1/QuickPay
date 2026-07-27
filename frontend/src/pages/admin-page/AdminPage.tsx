@@ -30,7 +30,8 @@ export const AdminPage: FC = () => {
   const filter = useSelector(ordersFilterSelector);
   const adminData = useSelector(adminDataSelector);
 
-  const [commissionUpdated, setCommissionUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
+  const [commissionSellUpdated, setSellCommissionUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
+  const [commissionBuyUpdated, setBuyCommissionUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
   const [walletUpdated, setWalletUpdated] = useState<TCheckType>({changed: false, prevValue: ""});
 
   const onAccept = (id: string, executionRate: number) => {
@@ -53,13 +54,19 @@ export const AdminPage: FC = () => {
     dispatch(patchOrder(patchOrderData));
   }
 
-  const handleCommissionChange = (newValue: string) => {
+  const handleSellCommissionChange = (newValue: string) => {
     // dispatch(patchAdminData({ comission: parseFloat(newValue) }));
-    setCommissionUpdated({prevValue: newValue, changed: adminData?.comission !== Number(newValue)})
+    setSellCommissionUpdated({prevValue: newValue, changed: adminData?.comissionSell !== Number(newValue)})
   };
+  
+  const handleBuyCommissionChange = (newValue: string) => {
+    // dispatch(patchAdminData({ comission: parseFloat(newValue) }));
+    setBuyCommissionUpdated({prevValue: newValue, changed: adminData?.comissionBuy !== Number(newValue)})
+  };
+  
   const handleWalletChange = (newValue: string) => {
     // setWalletValue(newValue);
-    setWalletUpdated({prevValue: newValue, changed: adminData?.comission !== Number(newValue)})
+    setWalletUpdated({prevValue: newValue, changed: (adminData?.comissionBuy !== Number(newValue) || adminData?.comissionSell !== Number(newValue))})
   };
 
   const updateWalletAdminData = ()=>{
@@ -69,9 +76,17 @@ export const AdminPage: FC = () => {
     dispatch(patchAdminData(adminData))
   }
 
-  const updateComissionAdminData = ()=>{
+  const updateComissionBuyAdminData = ()=>{
     const adminData : TAdminData = {
-      comission: Number(commissionUpdated.prevValue)
+      comissionBuy: Number(commissionBuyUpdated.prevValue)
+    }
+    // console.log("const updateComissionAdminData", commissionUpdated)
+    dispatch(patchAdminData(adminData))
+  }
+
+  const updateComissionSellAdminData = ()=>{
+    const adminData : TAdminData = {
+      comissionSell: Number(commissionSellUpdated.prevValue),
     }
     // console.log("const updateComissionAdminData", commissionUpdated)
     dispatch(patchAdminData(adminData))
@@ -85,9 +100,13 @@ export const AdminPage: FC = () => {
 
   useEffect(() => {
     // console.log('adminData changed', adminData)
-    if(adminData?.comission){
+    if(adminData?.comissionBuy){
       // handleCommissionChange(adminData?.comission.toString())
-      setCommissionUpdated({changed: false, prevValue: adminData?.comission.toString()})
+      setBuyCommissionUpdated({changed: false, prevValue: adminData?.comissionBuy.toString()})
+    }
+    if(adminData?.comissionSell){
+      // handleCommissionChange(adminData?.comission.toString())
+      setSellCommissionUpdated({changed: false, prevValue: adminData?.comissionSell.toString()})
     }
     if(adminData?.buyWallet){
       // handleWalletChange(adminData?.buyWallet)
@@ -109,15 +128,27 @@ export const AdminPage: FC = () => {
   return (
   <Page>
     <Text>
-      Установить комиссию(%)
+      Установить комиссию (покупка)(%)
     </Text>
     <Input
-     onValueChange={handleCommissionChange}
+     onValueChange={handleBuyCommissionChange}
      unit={"%"}
-     value={commissionUpdated.prevValue}
+     value={commissionBuyUpdated.prevValue}
      className='full-width'
      placeholder='Установите комиссию'/>
-    {commissionUpdated.changed && <Button onClick={()=>{updateComissionAdminData()}}>
+    {commissionBuyUpdated.changed && <Button onClick={()=>{updateComissionBuyAdminData()}}>
+      Сохранить
+    </Button>}
+    <Text>
+      Установить комиссию (продажа)(%)
+    </Text>
+    <Input
+     onValueChange={handleSellCommissionChange}
+     unit={"%"}
+     value={commissionSellUpdated.prevValue}
+     className='full-width'
+     placeholder='Установите комиссию'/>
+    {commissionSellUpdated.changed && <Button onClick={()=>{updateComissionSellAdminData()}}>
       Сохранить
     </Button>}
 

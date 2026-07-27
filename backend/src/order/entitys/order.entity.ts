@@ -38,7 +38,8 @@ export class OrderEntity {
 
   @Column({
     nullable: true,
-    default: null
+    default: null,
+    type: 'float'
   })
   executionRate: number;
 

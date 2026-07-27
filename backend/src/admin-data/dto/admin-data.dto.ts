@@ -7,7 +7,11 @@ import {
 export class AdminDataDTO {
   @IsNumber()
   @IsOptional()
-  comission: number = null;
+  comissionBuy: number = null;
+
+  @IsNumber()
+  @IsOptional()
+  comissionSell: number = null;
 
   @IsString()
   @IsOptional()

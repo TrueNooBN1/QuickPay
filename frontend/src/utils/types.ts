@@ -88,6 +88,7 @@ export type TOrderStatus = typeof TOrderStatus[keyof typeof TOrderStatus];
 
 
 export type TAdminData = {
-  comission?: number,
+  comissionSell?: number,
+  comissionBuy?: number,
   buyWallet?: string;
 }

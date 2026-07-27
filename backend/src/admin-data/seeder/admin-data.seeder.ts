@@ -18,8 +18,9 @@ export class AdminDataSeeder {
       console.log('🌱 Seeding admin data...');
       
       const data = [
-        { key: 'comission', value: '2' },
-        { key: 'wallet', value: 'Application description' },
+        { key: 'comissionBuy', value: '2' },
+        { key: 'comissionSell', value: '2' },
+        { key: 'wallet', value: 'TDzVu8mg7pwBcLn6eVSzRkjtoRgiWD6xU6' },
         { key: 'maintenance_mode', value: 'false' },
       ];
 

@@ -45,9 +45,9 @@ export class RapiraRateUpdaterService {
     let rates: TParsedRate = {rateIn: null, rateOut: null};
     data.data.forEach(element => {
         if(element['symbol'] === 'USDT/RUB'){
-            // console.log('Price', element['askPrice'])
+            // console.log('Price', element)
             rates.rateIn = element['askPrice'];
-            rates.rateOut = -1;
+            rates.rateOut = element['bidPrice'];
             return rates
         }        
     });

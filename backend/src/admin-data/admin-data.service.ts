@@ -22,7 +22,8 @@ export class AdminDataService {
   private prevRateOut: number | null = null;
   private prevRateUpdateTime: Date | null = null;
   private cachedBuyWallet: string| null = null;
-  private cachedComission: number| null = null;
+  private cachedBuyComission: number| null = null;
+  private cachedSellComission: number| null = null;
 
   
   setRate(rateIn:number, rateOut:number){
@@ -35,8 +36,8 @@ export class AdminDataService {
   getRates(){
     return {
       rates:{
-        rateIn: Math.floor(this.prevRateIn * (1 + this.cachedComission)*100)/100,//BUYRATE
-        rateOut: Math.ceil(this.prevRateOut * (1 - this.cachedComission)*100)/100//SELLRATE
+        rateIn: Math.floor(this.prevRateIn * (1 + this.cachedBuyComission)*100)/100,//BUYRATE
+        rateOut: Math.ceil(this.prevRateOut * (1 - this.cachedSellComission)*100)/100//SELLRATE
       }
     }
   }
@@ -47,18 +48,27 @@ export class AdminDataService {
                     this.cachedBuyWallet : 
                     (await this.adminDataRepository.findOneBy({key: "wallet"})).value;
 
-    if(!this.cachedComission)
+    if(!this.cachedBuyComission || !this.cachedSellComission)
       this.cachedBuyWallet = wallet;
 
-    const comission = this.cachedComission ?
-                    this.cachedComission :
-                    (await this.adminDataRepository.findOneBy({key: "comission"})).value;
+    const sellComission = this.cachedSellComission ?
+                    this.cachedSellComission :
+                    (await this.adminDataRepository.findOneBy({key: "comissionSell"})).value;
 
-    if(!this.cachedComission)
-      this.cachedComission = Number(comission)/100;
+    if(!this.cachedSellComission)
+      this.cachedSellComission = Number(sellComission)/100;
+
+    const buyComission = this.cachedBuyComission ?
+                    this.cachedBuyComission :
+                    (await this.adminDataRepository.findOneBy({key: "comissionBuy"})).value;
+
+    if(!this.cachedBuyComission)
+      this.cachedBuyComission = Number(buyComission)/100;
+
     const data: AdminDataDTO = {
       buyWallet: wallet,
-      comission: Number(comission) * 100,
+      comissionBuy: Number(buyComission) * 100,
+      comissionSell: Number(sellComission) * 100,
     }
     return data;
   }
@@ -76,21 +86,35 @@ export class AdminDataService {
         this.cachedBuyWallet = wallet;
     }
 
-    let comission = this.cachedComission;
-    if(newData.comission){
-      comission = (await this.adminDataRepository
+    let comissionBuy = this.cachedBuyComission;
+    let comissionSell = this.cachedSellComission;
+
+    if(newData.comissionBuy){
+      comissionBuy = (await this.adminDataRepository
         .createQueryBuilder()
         .update(AdminDataEntity)
-        .set({ value: String(newData.comission) })
-        .where('key = :key', { key: 'comission' })
+        .set({ value: String(newData.comissionBuy) })
+        .where('key = :key', { key: 'comissionBuy' })
         .returning('*')
         .execute()).raw[0].value/100;
-        this.cachedComission = comission;
+        this.cachedBuyComission = comissionBuy;
+    }
+
+    if(newData.comissionSell){
+      comissionSell = (await this.adminDataRepository
+        .createQueryBuilder()
+        .update(AdminDataEntity)
+        .set({ value: String(newData.comissionSell) })
+        .where('key = :key', { key: 'comissionSell' })
+        .returning('*')
+        .execute()).raw[0].value/100;
+        this.cachedSellComission = comissionSell;
     }
 
     const data: AdminDataDTO = {
       buyWallet: wallet,
-      comission: comission * 100,
+      comissionBuy: comissionBuy * 100,
+      comissionSell: comissionSell * 100,
     }
     return data;
   }
